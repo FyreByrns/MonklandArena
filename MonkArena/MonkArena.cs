@@ -19,5 +19,12 @@ namespace MonkArena {
             Version = $"{MajorVersion}.{MinorVersion}.{Revision}";
         }
 
+        public override void OnEnable() {
+            base.OnEnable();
+        }
+
+        public override void OnDisable() {
+            base.OnDisable();
+        }
     }
 }

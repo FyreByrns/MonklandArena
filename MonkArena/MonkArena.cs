@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using UnityEngine;
 
 namespace MonkArena {
     public class MonkArena : Partiality.Modloader.PartialityMod {
@@ -16,18 +17,13 @@ namespace MonkArena {
             author = "Little Tiny Big";
             ModID = "MonkArena";
             Version = $"{MajorVersion}.{MinorVersion}.{Revision}";
+
+            GameObject scriptObject = new GameObject();
+            scriptObject.AddComponent<MonkArenaScript>();
         }
 
         public override void OnEnable() {
             base.OnEnable();
-            On.Player.ctor += Player_ctor;
-        }
-
-        private void Player_ctor(On.Player.orig_ctor orig, Player self, AbstractCreature abstractCreature, World world) {
-            orig(self, abstractCreature, world);
-
-            Network.Connect("127.0.0.1");
-            Network.SendMessage("Testing");
         }
 
         public override void OnDisable() {

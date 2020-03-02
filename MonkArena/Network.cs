@@ -7,7 +7,9 @@ using System.Net;
 using System.Net.Sockets;
 
 namespace MonkArena {
-    static class Network {
+    public static class Network {
+        public static UdpListener Server { get; private set; }
+        public static UdpUser Me { get; private set; }
     }
 
     public struct Received {
@@ -15,7 +17,7 @@ namespace MonkArena {
         public string Message { get; set; }
     }
 
-    abstract class UdpBase {
+    public abstract class UdpBase {
         protected UdpClient Client;
 
         protected UdpBase() {
@@ -31,7 +33,7 @@ namespace MonkArena {
         }
     }
 
-    class UdpListener : UdpBase {
+    public class UdpListener : UdpBase {
         IPEndPoint listenOn;
 
         public UdpListener() : this(new IPEndPoint(IPAddress.Any, 19000)) { }
@@ -46,7 +48,7 @@ namespace MonkArena {
         }
     }
 
-    class UdpUser : UdpBase {
+    public class UdpUser : UdpBase {
         private UdpUser() { }
 
         public static UdpUser ConnectTo(string hostname, int port) {

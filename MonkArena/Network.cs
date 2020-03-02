@@ -15,8 +15,7 @@ namespace MonkArena {
 
         static Network() {
             Server = new UdpListener();
-
-
+            ServerReceive();
         }
 
         static void ServerReceive() {

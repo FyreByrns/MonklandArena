@@ -24,6 +24,7 @@ namespace MonkArena {
 
         public override void OnEnable() {
             base.OnEnable();
+            Logger.LogInfo("Enabled");
         }
 
         public override void OnDisable() {

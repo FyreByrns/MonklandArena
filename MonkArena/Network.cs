@@ -15,24 +15,16 @@ namespace MonkArena {
 
         static Network() {
             Server = new UdpListener();
-            ServerReceive();
-        }
-
-        static void ServerReceive() {
-            Thread t = new Thread(new ThreadStart(async () => {
-                while (true) {
-                    Received received = await Server.Receive();
-                    Logger.LogInfo($"{received.Sender}: {received.Message}");
-                };
-            }));
         }
 
         public static void Connect(string address) {
+            Logger.LogInfo("Attempting connection to " + address);
             Me = UdpUser.ConnectTo(address, 19000);
             Connected = true;
         }
 
         public static void SendMessage(string message) {
+            Logger.LogInfo("Attempting to send message " + message);
             if (!Connected) {
                 Logger.LogError("Can't send messages when disconnected.");
                 return;

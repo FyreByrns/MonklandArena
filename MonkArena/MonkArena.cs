@@ -20,6 +20,14 @@ namespace MonkArena {
 
         public override void OnEnable() {
             base.OnEnable();
+            On.Player.ctor += Player_ctor;
+        }
+
+        private void Player_ctor(On.Player.orig_ctor orig, Player self, AbstractCreature abstractCreature, World world) {
+            orig(self, abstractCreature, world);
+
+            Network.Connect("127.0.0.1");
+            Network.SendMessage("Testing");
         }
 
         public override void OnDisable() {

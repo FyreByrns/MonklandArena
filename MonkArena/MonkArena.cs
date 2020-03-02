@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 
 namespace MonkArena {
     public class MonkArena : Partiality.Modloader.PartialityMod {
-
         #region Versioning
         public string MajorVersion { get; } = "0";
         public string MinorVersion { get; } = "0";

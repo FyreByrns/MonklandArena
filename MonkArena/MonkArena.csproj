@@ -52,6 +52,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Logger.cs" />
     <Compile Include="MonkArena.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

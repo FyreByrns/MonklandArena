@@ -14,10 +14,8 @@ namespace MonkArena {
         static Logger() {
             AllocConsole();
             IntPtr stdHandle = GetStdHandle(STD_OUTPUT_HANDLE);
-            SafeFileHandle safeFileHandle = new SafeFileHandle(stdHandle, true);
-            FileStream fileStream = new FileStream(safeFileHandle, FileAccess.Write);
-            Encoding encoding = Encoding.GetEncoding(437);
-            output = new StreamWriter(fileStream, encoding);
+            FileStream fileStream = new FileStream(stdHandle, FileAccess.Write);
+            output = new StreamWriter(fileStream, Encoding.ASCII);
             output.AutoFlush = true;
         }
 

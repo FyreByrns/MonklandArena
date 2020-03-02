@@ -21,6 +21,12 @@ namespace MonkArena {
 
         public override void OnEnable() {
             base.OnEnable();
+            On.Player.Update += TestPlayerUpdateHook;
+        }
+
+        private void TestPlayerUpdateHook(On.Player.orig_Update orig, Player self, bool eu) {
+            Logger.LogInfo("Ticked in player");
+            orig(self, eu);
         }
 
         public override void OnDisable() {

@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Net;
 using System.Net.Sockets;
+using System.Threading;
 
 namespace MonkArena {
     public static class Network {
@@ -14,8 +15,17 @@ namespace MonkArena {
 
         static Network() {
             Server = new UdpListener();
-            
 
+
+        }
+
+        static void ServerReceive() {
+            Thread t = new Thread(new ThreadStart(async () => {
+                while (true) {
+                    Received received = await Server.Receive();
+                    Logger.LogInfo($"{received.Sender}: {received.Message}");
+                };
+            }));
         }
 
         public static void Connect(string address) {

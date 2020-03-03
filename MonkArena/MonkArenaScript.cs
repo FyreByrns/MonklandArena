@@ -19,7 +19,7 @@ namespace MonkArena {
 
             if (Network.Connected || Network.IsServer) {
                 if (Input.GetKeyDown(KeyCode.Space))
-                    Network.SendMessage("test");
+                    Network.SendString("test");
             }
         }
 

@@ -21,8 +21,8 @@ namespace MonkArena {
         }
 
         public static void Disconnect() {
-            if (IsServer) SendMessage("Server shutting down.");
-            else if (IsClient) SendMessage("disconnect");
+            if (IsServer) SendString("Server shutting down.");
+            else if (IsClient) SendString("disconnect");
         }
 
         #region Server
@@ -64,7 +64,7 @@ namespace MonkArena {
         }
         #endregion
 
-        public static void SendMessage(string message) {
+        public static void SendString(string message) {
             RWConsole.LogInfo("Attempting to send message " + message);
             if (!Connected && !IsServer) {
                 RWConsole.LogError("Can't send messages when disconnected.");

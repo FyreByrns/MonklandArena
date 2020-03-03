@@ -9,32 +9,76 @@ using System.Threading;
 namespace MonkArena {
     public static class Network {
         public static UdpListener Server { get; private set; }
-        public static UdpUser Me { get; private set; }
+        public static UdpUser Client { get; private set; }
         public static bool Connected { get; private set; }
+        public static bool IsServer { get; private set; }
+        public static bool IsClient { get; private set; }
+
+        public static List<IPEndPoint> ConnectedClients { get; private set; }
+        public static Dictionary<string, Message> UnreceivedMessages { get; private set; }
 
         static Network() {
-            Server = new UdpListener();
         }
 
-        public static void Connect(string address) {
-            Logger.LogInfo("Attempting connection to " + address);
-            Me = UdpUser.ConnectTo(address, 19000);
-            Server.StartReceive();
-            Me.StartReceive();
-            Connected = true;
+        public static void Disconnect() {
+            if (IsServer) SendMessage("Server shutting down.");
+            else if (IsClient) SendMessage("disconnect");
         }
+
+        #region Server
+        public static void SetupServer() {
+            RWConsole.LogInfo("Starting server...");
+            ConnectedClients = new List<IPEndPoint>();
+
+            Server = new UdpListener();
+            Server.MessageReceivedEvent += Server_MessageReceivedEvent;
+            Server.StartReceive();
+            IsServer = true;
+        }
+
+        private static void Server_MessageReceivedEvent(Received data) {
+            if (!ConnectedClients.Contains(data.Sender)) ConnectedClients.Add(data.Sender);
+        }
+        #endregion
+
+        #region Client
+        public static void SetupClient(string address) {
+            RWConsole.LogInfo("Attempting connection to " + address);
+            UnreceivedMessages = new Dictionary<string, Message>();
+
+            Client = UdpUser.ConnectTo(address, 19000);
+            Client.MessageReceivedEvent += Client_MessageReceivedEvent;
+            Client.StartReceive();
+            IsClient = true;
+            Connected = true;
+
+            RWConsole.LogInfo("Sending handshake...");
+            Client.Send(Message.FromString("handshake"));
+        }
+
+        private static void Client_MessageReceivedEvent(Received data) {
+            if (data.Message.Contains("received:")) {
+                string token = data.Message.Split(new[] { "received:" }, StringSplitOptions.RemoveEmptyEntries)[1];
+                UnreceivedMessages.Remove(token);
+            }
+        }
+        #endregion
 
         public static void SendMessage(string message) {
-            Logger.LogInfo("Attempting to send message " + message);
-            if (!Connected) {
-                Logger.LogError("Can't send messages when disconnected.");
+            RWConsole.LogInfo("Attempting to send message " + message);
+            if (!Connected && !IsServer) {
+                RWConsole.LogError("Can't send messages when disconnected.");
                 return;
             }
 
-            Me.Send(message);
+            if (IsServer) foreach (IPEndPoint ipep in ConnectedClients) Server.Reply(Message.FromString(message), ipep);
+            else {
+                Message m = Message.FromString(message);
+                UnreceivedMessages[m.Token] = m;
+                Client.Send(m);
+            }
         }
     }
-
     public struct Received {
         public IPEndPoint Sender { get; set; }
         public string Message { get; set; }
@@ -64,7 +108,7 @@ namespace MonkArena {
             byte[] receivedBytes = u.EndReceive(ar, ref e);
             string receivedString = Encoding.ASCII.GetString(receivedBytes);
 
-            Logger.LogInfo($"Received: {receivedString} From: {e}");
+            RWConsole.LogInfo($"Received: {receivedString} From: {e}");
             MessageReceivedEvent?.Invoke(new Received() { Sender = e, Message = receivedString });
         }
     }
@@ -88,8 +132,8 @@ namespace MonkArena {
             Client.BeginReceive(new AsyncCallback(ReceiveCallback), state);
         }
 
-        public void Reply(string message, IPEndPoint endpoint) {
-            var datagram = Encoding.ASCII.GetBytes(message);
+        public void Reply(Message message, IPEndPoint endpoint) {
+            var datagram = Encoding.ASCII.GetBytes(message.ToString());
             Client.Send(datagram, datagram.Length, endpoint);
         }
     }
@@ -112,8 +156,8 @@ namespace MonkArena {
             Client.BeginReceive(new AsyncCallback(ReceiveCallback), state);
         }
 
-        public void Send(string message) {
-            var datagram = Encoding.ASCII.GetBytes(message);
+        public void Send(Message message) {
+            var datagram = Encoding.ASCII.GetBytes(message.ToString());
             Client.Send(datagram, datagram.Length);
         }
     }

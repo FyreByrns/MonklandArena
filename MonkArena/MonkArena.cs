@@ -12,6 +12,8 @@ namespace MonkArena {
         public string Revision { get; } = "1";
         #endregion
 
+        MonkArenaScript script;
+
         public MonkArena() {
             author = "Little Tiny Big";
             ModID = "MonkArena";
@@ -22,34 +24,28 @@ namespace MonkArena {
             base.OnEnable();
 
             Debug.Log("------------------------------------------------------------INITIALIZING LOGGER");
-            Logger.Initialize();
-            Network.Me.MessageReceivedEvent += Me_MessageReceivedEvent;
-            Network.Server.MessageReceivedEvent += Server_MessageReceivedEvent;
+            RWConsole.Initialize();
+
+            GameObject scriptObject = new GameObject();
+            script = scriptObject.AddComponent<MonkArenaScript>();
+            script = new MonkArenaScript();
+
+            AppDomain.CurrentDomain.ProcessExit += CurrentDomain_ProcessExit;
+            On.RainWorldGame.ExitGame += RainWorldGame_ExitGame;
 
             On.Player.Update += Player_Update;
         }
 
-        private void Server_MessageReceivedEvent(Received data) {
-            Logger.LogInfo($"{data.Sender}: {data.Message}");
-            Network.Server.Reply("received", data.Sender);
-            Network.Server.StartReceive();
+        private void RainWorldGame_ExitGame(On.RainWorldGame.orig_ExitGame orig, RainWorldGame self, bool asDeath, bool asQuit) {
+            Network.Disconnect();
         }
 
-        private void Me_MessageReceivedEvent(Received data) {
-            Logger.LogInfo($"{data.Sender}: {data.Message}");
-            Network.Me.StartReceive();
+        private void CurrentDomain_ProcessExit(object sender, EventArgs e) {
+            Network.Disconnect();
         }
 
         private void Player_Update(On.Player.orig_Update orig, Player self, bool eu) {
             orig(self, eu);
-
-            if (Input.GetKeyDown(KeyCode.C))
-                Network.Connect("127.0.0.1");
-
-            if (Network.Connected) {
-                if (Input.GetKeyDown(KeyCode.Space))
-                    Network.SendMessage("test");
-            }
         }
 
         public override void OnDisable() {

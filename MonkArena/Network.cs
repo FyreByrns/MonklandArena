@@ -19,6 +19,10 @@ namespace MonkArena {
         static Network() {
         }
 
+        public static void Disconnect() {
+
+        }
+
         public static void SetupServer() {
             RWConsole.LogInfo("Starting server...");
             ConnectedClients = new List<IPEndPoint>();

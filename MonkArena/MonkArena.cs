@@ -30,7 +30,13 @@ namespace MonkArena {
             script = scriptObject.AddComponent<MonkArenaScript>();
             script = new MonkArenaScript();
 
+            AppDomain.CurrentDomain.ProcessExit += CurrentDomain_ProcessExit;
+
             On.Player.Update += Player_Update;
+        }
+
+        private void CurrentDomain_ProcessExit(object sender, EventArgs e) {
+            Network.Disconnect();
         }
 
         private void Player_Update(On.Player.orig_Update orig, Player self, bool eu) {

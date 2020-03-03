@@ -45,7 +45,7 @@ namespace MonkArena {
             Connected = true;
 
             RWConsole.LogInfo("Sending handshake...");
-            Client.Send("handshake");
+            Client.Send(Message.FromString("handshake"));
         }
 
         public static void SendMessage(string message) {
@@ -55,8 +55,8 @@ namespace MonkArena {
                 return;
             }
 
-            if (IsServer) foreach (IPEndPoint ipep in ConnectedClients) Server.Reply(message, ipep);
-            else Client.Send(message);
+            if (IsServer) foreach (IPEndPoint ipep in ConnectedClients) Server.Reply(Message.FromString(message), ipep);
+            else Client.Send(Message.FromString(message));
         }
     }
     public struct Received {
@@ -112,8 +112,8 @@ namespace MonkArena {
             Client.BeginReceive(new AsyncCallback(ReceiveCallback), state);
         }
 
-        public void Reply(string message, IPEndPoint endpoint) {
-            var datagram = Encoding.ASCII.GetBytes(message);
+        public void Reply(Message message, IPEndPoint endpoint) {
+            var datagram = Encoding.ASCII.GetBytes(message.ToString());
             Client.Send(datagram, datagram.Length, endpoint);
         }
     }
@@ -136,8 +136,8 @@ namespace MonkArena {
             Client.BeginReceive(new AsyncCallback(ReceiveCallback), state);
         }
 
-        public void Send(string message) {
-            var datagram = Encoding.ASCII.GetBytes(message);
+        public void Send(Message message) {
+            var datagram = Encoding.ASCII.GetBytes(message.ToString());
             Client.Send(datagram, datagram.Length);
         }
     }

@@ -33,7 +33,7 @@ namespace MonkArena {
             AppDomain.CurrentDomain.ProcessExit += CurrentDomain_ProcessExit;
             On.RainWorldGame.ExitGame += RainWorldGame_ExitGame;
 
-            On.Player.Update += Player_Update;
+            PlayerHooks.Hook();
         }
 
         private void RainWorldGame_ExitGame(On.RainWorldGame.orig_ExitGame orig, RainWorldGame self, bool asDeath, bool asQuit) {
@@ -42,10 +42,6 @@ namespace MonkArena {
 
         private void CurrentDomain_ProcessExit(object sender, EventArgs e) {
             Network.Disconnect();
-        }
-
-        private void Player_Update(On.Player.orig_Update orig, Player self, bool eu) {
-            orig(self, eu);
         }
 
         public override void OnDisable() {

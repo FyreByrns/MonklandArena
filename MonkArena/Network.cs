@@ -65,17 +65,33 @@ namespace MonkArena {
         #endregion
 
         public static void SendString(string message) {
-            RWConsole.LogInfo("Attempting to send message " + message);
+            RWConsole.LogInfo("Attempting to send string " + message);
             if (!Connected && !IsServer) {
-                RWConsole.LogError("Can't send messages when disconnected.");
+                RWConsole.LogError("Can't send when disconnected.");
                 return;
             }
 
-            if (IsServer) foreach (IPEndPoint ipep in ConnectedClients) Server.Reply(Message.FromString(message), ipep);
+            if (IsServer)
+                foreach (IPEndPoint ipep in ConnectedClients) Server.Reply(Message.FromString(message), ipep);
             else {
                 Message m = Message.FromString(message);
                 UnreceivedMessages[m.Token] = m;
                 Client.Send(m);
+            }
+        }
+
+        public static void SendMessage(Message message) {
+            RWConsole.LogInfo("Attempting to send message " + message.ToString());
+            if (!Connected && !IsServer) {
+                RWConsole.LogError("Can't send when disconnected.");
+                return;
+            }
+
+            if (IsServer)
+                foreach (IPEndPoint ipep in ConnectedClients) Server.Reply(message, ipep);
+            else {
+                UnreceivedMessages[message.Token] = message;
+                Client.Send(message);
             }
         }
     }

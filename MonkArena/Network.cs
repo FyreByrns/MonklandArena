@@ -19,6 +19,8 @@ namespace MonkArena {
         public static void Connect(string address) {
             Logger.LogInfo("Attempting connection to " + address);
             Me = UdpUser.ConnectTo(address, 19000);
+            Server.StartReceive();
+            Me.StartReceive();
             Connected = true;
         }
 
@@ -53,6 +55,8 @@ namespace MonkArena {
             public IPEndPoint e;
         }
 
+        public virtual void StartReceive() { }
+
         public void ReceiveCallback(IAsyncResult ar) {
             UdpClient u = ((UdpState)ar.AsyncState).u;
             IPEndPoint e = ((UdpState)(ar.AsyncState)).e;
@@ -74,6 +78,16 @@ namespace MonkArena {
             Client = new UdpClient(listenOn);
         }
 
+        public override void StartReceive() {
+            base.StartReceive();
+
+            UdpState state = new UdpState() {
+                e = listenOn,
+                u = Client
+            };
+            Client.BeginReceive(new AsyncCallback(ReceiveCallback), state);
+        }
+
         public void Reply(string message, IPEndPoint endpoint) {
             var datagram = Encoding.ASCII.GetBytes(message);
             Client.Send(datagram, datagram.Length, endpoint);
@@ -86,6 +100,16 @@ namespace MonkArena {
             var connection = new UdpUser();
             connection.Client.Connect(hostname, port);
             return connection;
+        }
+
+        public override void StartReceive() {
+            base.StartReceive();
+
+            UdpState state = new UdpState() {
+                e = new IPEndPoint(IPAddress.Any, 19000),
+                u = Client
+            };
+            Client.BeginReceive(new AsyncCallback(ReceiveCallback), state);
         }
 
         public void Send(string message) {

@@ -23,23 +23,23 @@ namespace MonkArena {
 
             Debug.Log("------------------------------------------------------------INITIALIZING LOGGER");
             Logger.Initialize();
+            Network.Me.MessageReceivedEvent += Me_MessageReceivedEvent;
 
             On.Player.Update += Player_Update;
+        }
+
+        private void Me_MessageReceivedEvent(Received data) {
+            Logger.LogInfo($"{data.Sender}: {data.Message}");
+            Network.Me.StartReceive();
         }
 
         private void Player_Update(On.Player.orig_Update orig, Player self, bool eu) {
             orig(self, eu);
 
-            if (Input.GetKeyDown(KeyCode.Space))
-                Logger.LogInfo("ASFJHLAKSJDHLKAJFHSLKJFSHLKJFSH");
-
             if (Input.GetKeyDown(KeyCode.C))
                 Network.Connect("127.0.0.1");
 
             if (Network.Connected) {
-                Received result = Network.Server.Receive().Result;
-                Logger.LogInfo($"{result.Sender}: {result.Message}");
-
                 if (Input.GetKeyDown(KeyCode.Space))
                     Network.SendMessage("test");
             }

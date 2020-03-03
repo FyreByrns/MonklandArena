@@ -10,6 +10,9 @@ namespace MonkArena {
         public string Contents { get; private set; }
 
         public static Message FromString(string s) => new Message() { Type = "string", Token = GenerateToken(), Contents = s };
+        public static Message FromInt(int i) => new Message() { Type = "int", Token = GenerateToken(), Contents = $"{i}" };
+        public static Message FromFloat(float f) => new Message() { Type = "float", Token = GenerateToken(), Contents = $"{f}" };
+
         public override string ToString() => $"({Type}){Token}:{Contents}";
 
         static int tokenLength = 20;

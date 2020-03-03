@@ -7,7 +7,7 @@ using Microsoft.Win32.SafeHandles;
 using System.IO;
 
 namespace MonkArena {
-    public static class Logger {
+    public static class RWConsole {
         public static StreamWriter Output;
 
         public static void Initialize() {

@@ -22,7 +22,7 @@ namespace MonkArena {
             base.OnEnable();
 
             Debug.Log("------------------------------------------------------------INITIALIZING LOGGER");
-            Logger.Initialize();
+            RWConsole.Initialize();
             Network.Me.MessageReceivedEvent += Me_MessageReceivedEvent;
             Network.Server.MessageReceivedEvent += Server_MessageReceivedEvent;
 
@@ -30,13 +30,13 @@ namespace MonkArena {
         }
 
         private void Server_MessageReceivedEvent(Received data) {
-            Logger.LogInfo($"{data.Sender}: {data.Message}");
+            RWConsole.LogInfo($"{data.Sender}: {data.Message}");
             Network.Server.Reply("received", data.Sender);
             Network.Server.StartReceive();
         }
 
         private void Me_MessageReceivedEvent(Received data) {
-            Logger.LogInfo($"{data.Sender}: {data.Message}");
+            RWConsole.LogInfo($"{data.Sender}: {data.Message}");
             Network.Me.StartReceive();
         }
 

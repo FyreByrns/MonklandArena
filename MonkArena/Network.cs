@@ -17,7 +17,7 @@ namespace MonkArena {
         }
 
         public static void Connect(string address) {
-            Logger.LogInfo("Attempting connection to " + address);
+            RWConsole.LogInfo("Attempting connection to " + address);
             Me = UdpUser.ConnectTo(address, 19000);
             Server.StartReceive();
             Me.StartReceive();
@@ -25,9 +25,9 @@ namespace MonkArena {
         }
 
         public static void SendMessage(string message) {
-            Logger.LogInfo("Attempting to send message " + message);
+            RWConsole.LogInfo("Attempting to send message " + message);
             if (!Connected) {
-                Logger.LogError("Can't send messages when disconnected.");
+                RWConsole.LogError("Can't send messages when disconnected.");
                 return;
             }
 
@@ -64,7 +64,7 @@ namespace MonkArena {
             byte[] receivedBytes = u.EndReceive(ar, ref e);
             string receivedString = Encoding.ASCII.GetString(receivedBytes);
 
-            Logger.LogInfo($"Received: {receivedString} From: {e}");
+            RWConsole.LogInfo($"Received: {receivedString} From: {e}");
             MessageReceivedEvent?.Invoke(new Received() { Sender = e, Message = receivedString });
         }
     }

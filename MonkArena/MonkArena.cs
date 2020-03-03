@@ -23,8 +23,6 @@ namespace MonkArena {
 
             Debug.Log("------------------------------------------------------------INITIALIZING LOGGER");
             RWConsole.Initialize();
-            Network.Me.MessageReceivedEvent += Me_MessageReceivedEvent;
-            Network.Server.MessageReceivedEvent += Server_MessageReceivedEvent;
 
             On.Player.Update += Player_Update;
         }
@@ -43,8 +41,15 @@ namespace MonkArena {
         private void Player_Update(On.Player.orig_Update orig, Player self, bool eu) {
             orig(self, eu);
 
-            if (Input.GetKeyDown(KeyCode.C))
-                Network.Connect("127.0.0.1");
+            if (Input.GetKeyUp(KeyCode.S)) {
+                Network.SetupServer();
+                Network.Server.MessageReceivedEvent += Server_MessageReceivedEvent;
+            }
+
+            if (Input.GetKeyUp(KeyCode.C)) {
+                Network.SetupClient("127.0.0.1");
+                Network.Me.MessageReceivedEvent += Me_MessageReceivedEvent;
+            }
 
             if (Network.Connected) {
                 if (Input.GetKeyDown(KeyCode.Space))

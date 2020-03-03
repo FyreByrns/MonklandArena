@@ -11,15 +11,20 @@ namespace MonkArena {
         public static UdpListener Server { get; private set; }
         public static UdpUser Me { get; private set; }
         public static bool Connected { get; private set; }
+        public static bool IsServer { get; private set; }
 
         static Network() {
-            Server = new UdpListener();
         }
 
-        public static void Connect(string address) {
+        public static void SetupServer() {
+            RWConsole.LogInfo("Starting server...");
+            Server = new UdpListener();
+            Server.StartReceive();
+            IsServer = true;
+        }
+        public static void SetupClient(string address) {
             RWConsole.LogInfo("Attempting connection to " + address);
             Me = UdpUser.ConnectTo(address, 19000);
-            Server.StartReceive();
             Me.StartReceive();
             Connected = true;
         }

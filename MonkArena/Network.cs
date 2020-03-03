@@ -33,7 +33,7 @@ namespace MonkArena {
 
         public static void SendMessage(string message) {
             RWConsole.LogInfo("Attempting to send message " + message);
-            if (!Connected) {
+            if (!Connected && !IsServer) {
                 RWConsole.LogError("Can't send messages when disconnected.");
                 return;
             }

@@ -8,18 +8,19 @@ using System.IO;
 
 namespace MonkArena {
     public static class Logger {
-        static StreamWriter output;
+        public static StreamWriter Output;
 
-        static Logger() {
+        public static void Initialize() {
             AllocConsole();
             IntPtr stdHandle = GetStdHandle(STD_OUTPUT_HANDLE);
             FileStream fileStream = new FileStream(stdHandle, FileAccess.Write);
-            output = new StreamWriter(fileStream, Encoding.ASCII);
-            output.AutoFlush = true;
+            Output = new StreamWriter(fileStream, Encoding.ASCII) {
+                AutoFlush = true,
+            };
         }
 
         public static void Log(object message, string prefix = "INFO") {
-            output.WriteLine($"[{prefix}][{DateTime.UtcNow}] {message}");
+            Output.WriteLine($"[{prefix}][{DateTime.UtcNow}] {message}");
         }
         public static void LogError(object message) {
             Log(message, "ERROR");

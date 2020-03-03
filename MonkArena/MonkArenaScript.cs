@@ -25,7 +25,7 @@ namespace MonkArena {
 
         private void Server_MessageReceivedEvent(Received data) {
             RWConsole.LogInfo($"{data.Sender}: {data.Message}");
-            Network.Server.Reply(Message.FromString("received"), data.Sender);
+            Network.Server.Reply(Message.FromString($"received:{Message.GetToken(data.Message)}"), data.Sender);
             Network.Server.StartReceive();
         }
 

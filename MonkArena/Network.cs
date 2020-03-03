@@ -15,6 +15,7 @@ namespace MonkArena {
         public static bool IsClient { get; private set; }
 
         public static List<IPEndPoint> ConnectedClients { get; private set; }
+        public static Dictionary<string, Message> UnreceivedMessages { get; private set; }
 
         static Network() {
         }
@@ -24,9 +25,11 @@ namespace MonkArena {
             else if (IsClient) SendMessage("disconnect");
         }
 
+        #region Server
         public static void SetupServer() {
             RWConsole.LogInfo("Starting server...");
             ConnectedClients = new List<IPEndPoint>();
+
             Server = new UdpListener();
             Server.MessageReceivedEvent += Server_MessageReceivedEvent;
             Server.StartReceive();
@@ -36,10 +39,15 @@ namespace MonkArena {
         private static void Server_MessageReceivedEvent(Received data) {
             if (!ConnectedClients.Contains(data.Sender)) ConnectedClients.Add(data.Sender);
         }
+        #endregion
 
+        #region Client
         public static void SetupClient(string address) {
             RWConsole.LogInfo("Attempting connection to " + address);
+            UnreceivedMessages = new Dictionary<string, Message>();
+
             Client = UdpUser.ConnectTo(address, 19000);
+            Client.MessageReceivedEvent += Client_MessageReceivedEvent;
             Client.StartReceive();
             IsClient = true;
             Connected = true;
@@ -47,6 +55,14 @@ namespace MonkArena {
             RWConsole.LogInfo("Sending handshake...");
             Client.Send(Message.FromString("handshake"));
         }
+
+        private static void Client_MessageReceivedEvent(Received data) {
+            if (data.Message.Contains("received:")) {
+                string token = data.Message.Split(new[] { "received:" }, StringSplitOptions.RemoveEmptyEntries)[1];
+                UnreceivedMessages.Remove(token);
+            }
+        }
+        #endregion
 
         public static void SendMessage(string message) {
             RWConsole.LogInfo("Attempting to send message " + message);
@@ -56,7 +72,11 @@ namespace MonkArena {
             }
 
             if (IsServer) foreach (IPEndPoint ipep in ConnectedClients) Server.Reply(Message.FromString(message), ipep);
-            else Client.Send(Message.FromString(message));
+            else {
+                Message m = Message.FromString(message);
+                UnreceivedMessages[m.Token] = m;
+                Client.Send(m);
+            }
         }
     }
     public struct Received {

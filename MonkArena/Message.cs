@@ -9,6 +9,8 @@ namespace MonkArena {
         public string Token { get; private set; }
         public string Contents { get; private set; }
 
+        public static string GetToken(string s) => s.Split(')')[1].Split(':')[0];
+
         public static Message FromString(string s) => new Message() { Type = "string", Token = GenerateToken(), Contents = s };
         public static Message FromInt(int i) => new Message() { Type = "int", Token = GenerateToken(), Contents = $"{i}" };
         public static Message FromFloat(float f) => new Message() { Type = "float", Token = GenerateToken(), Contents = $"{f}" };

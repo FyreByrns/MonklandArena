@@ -106,7 +106,7 @@ namespace MonkArena {
             base.StartReceive();
 
             UdpState state = new UdpState() {
-                e = new IPEndPoint(IPAddress.Any, 19000),
+                e = new IPEndPoint(IPAddress.Any, 19001),
                 u = Client
             };
             Client.BeginReceive(new AsyncCallback(ReceiveCallback), state);

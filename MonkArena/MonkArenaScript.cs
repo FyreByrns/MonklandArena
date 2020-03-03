@@ -31,6 +31,7 @@ namespace MonkArena {
 
         private void Me_MessageReceivedEvent(Received data) {
             RWConsole.LogInfo($"{data.Sender}: {data.Message}");
+            RWConsole.LogInfo($"{Network.UnreceivedMessages.Count} messages not received by server.");
             Network.Client.StartReceive();
         }
     }

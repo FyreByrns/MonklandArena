@@ -9,6 +9,7 @@ namespace MonkArena {
         public string Contents { get; private set; }
 
         public static Message FromString(string s) => new Message() { Token = GenerateToken(), Contents = s };
+        public override string ToString() => $"{Token}:{Contents}";
 
         static int tokenLength = 20;
         static Random rng = new Random();

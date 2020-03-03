@@ -14,7 +14,7 @@ namespace MonkArena {
         public static bool IsServer { get; private set; }
         public static bool IsClient { get; private set; }
 
-        public static List<IPEndPoint> ConnectedClients { get; private set; }
+        public static Dictionary<IPEndPoint, PlayerInfo> ConnectedClients { get; private set; }
         public static Dictionary<string, Message> UnreceivedMessages { get; private set; }
 
         static Network() {
@@ -28,7 +28,7 @@ namespace MonkArena {
         #region Server
         public static void SetupServer() {
             RWConsole.LogInfo("Starting server...");
-            ConnectedClients = new List<IPEndPoint>();
+            ConnectedClients = new Dictionary<IPEndPoint, PlayerInfo>();
 
             Server = new UdpListener();
             Server.MessageReceivedEvent += Server_MessageReceivedEvent;
@@ -37,7 +37,7 @@ namespace MonkArena {
         }
 
         private static void Server_MessageReceivedEvent(Received data) {
-            if (!ConnectedClients.Contains(data.Sender)) ConnectedClients.Add(data.Sender);
+            if (!ConnectedClients.ContainsKey(data.Sender)) ConnectedClients[data.Sender] = new PlayerInfo();
         }
         #endregion
 
@@ -72,7 +72,7 @@ namespace MonkArena {
             }
 
             if (IsServer)
-                foreach (IPEndPoint ipep in ConnectedClients) Server.Reply(Message.FromString(message), ipep);
+                foreach (IPEndPoint ipep in ConnectedClients.Keys) Server.Reply(Message.FromString(message), ipep);
             else {
                 Message m = Message.FromString(message);
                 UnreceivedMessages[m.Token] = m;
@@ -88,13 +88,18 @@ namespace MonkArena {
             }
 
             if (IsServer)
-                foreach (IPEndPoint ipep in ConnectedClients) Server.Reply(message, ipep);
+                foreach (IPEndPoint ipep in ConnectedClients.Keys) Server.Reply(message, ipep);
             else {
                 UnreceivedMessages[message.Token] = message;
                 Client.Send(message);
             }
         }
+
+        public struct PlayerInfo {
+
+        }
     }
+
     public struct Received {
         public IPEndPoint Sender { get; set; }
         public string Message { get; set; }

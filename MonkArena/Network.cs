@@ -59,7 +59,6 @@ namespace MonkArena {
             else Client.Send(message);
         }
     }
-
     public struct Received {
         public IPEndPoint Sender { get; set; }
         public string Message { get; set; }

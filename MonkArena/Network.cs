@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using System.Net;
 using System.Net.Sockets;
 
@@ -18,18 +17,29 @@ namespace MonkArena {
     }
 
     public abstract class UdpBase {
+        public delegate void MessageReceived(Received data);
+        public event MessageReceived MessageReceivedEvent;
+
         protected UdpClient Client;
 
         protected UdpBase() {
             Client = new UdpClient();
         }
 
-        public async Task<Received> Receive() {
-            var result = await Client.ReceiveAsync();
-            return new Received() {
-                Message = Encoding.ASCII.GetString(result.Buffer, 0, result.Buffer.Length),
-                Sender = result.RemoteEndPoint,
-            };
+        public struct UdpState {
+            public UdpClient u;
+            public IPEndPoint e;
+        }
+
+        public void ReceiveCallback(IAsyncResult ar) {
+            UdpClient u = ((UdpState)ar.AsyncState).u;
+            IPEndPoint e = ((UdpState)(ar.AsyncState)).e;
+
+            byte[] receivedBytes = u.EndReceive(ar, ref e);
+            string receivedString = Encoding.ASCII.GetString(receivedBytes);
+
+            Logger.LogInfo($"Received: {receivedString} From: {e}");
+            MessageReceivedEvent?.Invoke(new Received() { Sender = e, Message = receivedString });
         }
     }
 
@@ -47,7 +57,6 @@ namespace MonkArena {
             Client.Send(datagram, datagram.Length, endpoint);
         }
     }
-
     public class UdpUser : UdpBase {
         private UdpUser() { }
 

@@ -96,7 +96,16 @@ namespace MonkArena {
         }
 
         public struct PlayerInfo {
+            public string Username { get; set; }
 
+            public bool Alive => !Creature.dead;
+            public bool Dead => !Alive;
+
+            public Player Player { get; set; }
+            public Creature Creature => Player;
+
+            public Player.AnimationIndex Animation { get => Player.animation; set { Player.animation = value; } }
+            public Player.BodyModeIndex BodyMode { get => Player.bodyMode; set { Player.bodyMode = value; } }
         }
     }
 

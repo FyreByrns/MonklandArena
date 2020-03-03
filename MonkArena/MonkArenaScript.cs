@@ -17,7 +17,7 @@ namespace MonkArena {
                 Network.Me.MessageReceivedEvent += Me_MessageReceivedEvent;
             }
 
-            if (Network.Connected) {
+            if (Network.Connected || Network.IsServer) {
                 if (Input.GetKeyDown(KeyCode.Space))
                     Network.SendMessage("test");
             }

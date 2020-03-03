@@ -14,7 +14,7 @@ namespace MonkArena {
 
             if (Input.GetKeyUp(KeyCode.C)) {
                 Network.SetupClient("127.0.0.1");
-                Network.Me.MessageReceivedEvent += Me_MessageReceivedEvent;
+                Network.Client.MessageReceivedEvent += Me_MessageReceivedEvent;
             }
 
             if (Network.Connected || Network.IsServer) {
@@ -31,7 +31,7 @@ namespace MonkArena {
 
         private void Me_MessageReceivedEvent(Received data) {
             RWConsole.LogInfo($"{data.Sender}: {data.Message}");
-            Network.Me.StartReceive();
+            Network.Client.StartReceive();
         }
     }
 }

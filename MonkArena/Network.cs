@@ -9,26 +9,38 @@ using System.Threading;
 namespace MonkArena {
     public static class Network {
         public static UdpListener Server { get; private set; }
-        public static UdpUser Me { get; private set; }
+        public static UdpUser Client { get; private set; }
         public static bool Connected { get; private set; }
         public static bool IsServer { get; private set; }
         public static bool IsClient { get; private set; }
+
+        public static List<IPEndPoint> ConnectedClients { get; private set; }
 
         static Network() {
         }
 
         public static void SetupServer() {
             RWConsole.LogInfo("Starting server...");
+            ConnectedClients = new List<IPEndPoint>();
             Server = new UdpListener();
+            Server.MessageReceivedEvent += Server_MessageReceivedEvent;
             Server.StartReceive();
             IsServer = true;
         }
+
+        private static void Server_MessageReceivedEvent(Received data) {
+            if (!ConnectedClients.Contains(data.Sender)) ConnectedClients.Add(data.Sender);
+        }
+
         public static void SetupClient(string address) {
             RWConsole.LogInfo("Attempting connection to " + address);
-            Me = UdpUser.ConnectTo(address, 19000);
-            Me.StartReceive();
+            Client = UdpUser.ConnectTo(address, 19000);
+            Client.StartReceive();
             IsClient = true;
             Connected = true;
+
+            RWConsole.LogInfo("Sending handshake...");
+            Client.Send("handshake");
         }
 
         public static void SendMessage(string message) {
@@ -38,7 +50,8 @@ namespace MonkArena {
                 return;
             }
 
-            Me.Send(message);
+            if (IsServer) foreach (IPEndPoint ipep in ConnectedClients) Server.Reply(message, ipep);
+            else Client.Send(message);
         }
     }
 

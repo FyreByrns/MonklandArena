@@ -31,6 +31,7 @@ namespace MonkArena {
 
         private void Server_MessageReceivedEvent(Received data) {
             Logger.LogInfo($"{data.Sender}: {data.Message}");
+            Network.Server.Reply("received", data.Sender);
             Network.Server.StartReceive();
         }
 

@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading;
@@ -20,6 +19,8 @@ namespace MonkArena {
         public static void Connect(string address) {
             Logger.LogInfo("Attempting connection to " + address);
             Me = UdpUser.ConnectTo(address, 19000);
+            Server.StartReceive();
+            Me.StartReceive();
             Connected = true;
         }
 
@@ -40,18 +41,31 @@ namespace MonkArena {
     }
 
     public abstract class UdpBase {
+        public delegate void MessageReceived(Received data);
+        public event MessageReceived MessageReceivedEvent;
+
         protected UdpClient Client;
 
         protected UdpBase() {
             Client = new UdpClient();
         }
 
-        public async Task<Received> Receive() {
-            var result = await Client.ReceiveAsync();
-            return new Received() {
-                Message = Encoding.ASCII.GetString(result.Buffer, 0, result.Buffer.Length),
-                Sender = result.RemoteEndPoint,
-            };
+        public struct UdpState {
+            public UdpClient u;
+            public IPEndPoint e;
+        }
+
+        public virtual void StartReceive() { }
+
+        public void ReceiveCallback(IAsyncResult ar) {
+            UdpClient u = ((UdpState)ar.AsyncState).u;
+            IPEndPoint e = ((UdpState)(ar.AsyncState)).e;
+
+            byte[] receivedBytes = u.EndReceive(ar, ref e);
+            string receivedString = Encoding.ASCII.GetString(receivedBytes);
+
+            Logger.LogInfo($"Received: {receivedString} From: {e}");
+            MessageReceivedEvent?.Invoke(new Received() { Sender = e, Message = receivedString });
         }
     }
 
@@ -64,12 +78,21 @@ namespace MonkArena {
             Client = new UdpClient(listenOn);
         }
 
+        public override void StartReceive() {
+            base.StartReceive();
+
+            UdpState state = new UdpState() {
+                e = listenOn,
+                u = Client
+            };
+            Client.BeginReceive(new AsyncCallback(ReceiveCallback), state);
+        }
+
         public void Reply(string message, IPEndPoint endpoint) {
             var datagram = Encoding.ASCII.GetBytes(message);
             Client.Send(datagram, datagram.Length, endpoint);
         }
     }
-
     public class UdpUser : UdpBase {
         private UdpUser() { }
 
@@ -77,6 +100,16 @@ namespace MonkArena {
             var connection = new UdpUser();
             connection.Client.Connect(hostname, port);
             return connection;
+        }
+
+        public override void StartReceive() {
+            base.StartReceive();
+
+            UdpState state = new UdpState() {
+                e = new IPEndPoint(IPAddress.Any, 19001),
+                u = Client
+            };
+            Client.BeginReceive(new AsyncCallback(ReceiveCallback), state);
         }
 
         public void Send(string message) {

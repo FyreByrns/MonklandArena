@@ -20,7 +20,8 @@ namespace MonkArena {
         }
 
         public static void Disconnect() {
-
+            if (IsServer) SendMessage("Server shutting down.");
+            else if (IsClient) SendMessage("disconnect");
         }
 
         public static void SetupServer() {

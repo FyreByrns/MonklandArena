@@ -31,8 +31,13 @@ namespace MonkArena {
             script = new MonkArenaScript();
 
             AppDomain.CurrentDomain.ProcessExit += CurrentDomain_ProcessExit;
+            On.RainWorldGame.ExitGame += RainWorldGame_ExitGame;
 
             On.Player.Update += Player_Update;
+        }
+
+        private void RainWorldGame_ExitGame(On.RainWorldGame.orig_ExitGame orig, RainWorldGame self, bool asDeath, bool asQuit) {
+            Network.Disconnect();
         }
 
         private void CurrentDomain_ProcessExit(object sender, EventArgs e) {

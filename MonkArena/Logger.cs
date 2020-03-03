@@ -9,14 +9,21 @@ using System.IO;
 namespace MonkArena {
     public static class RWConsole {
         public static StreamWriter Output;
+        static FileStream stream;
 
         public static void Initialize() {
             AllocConsole();
             IntPtr stdHandle = GetStdHandle(STD_OUTPUT_HANDLE);
-            FileStream fileStream = new FileStream(stdHandle, FileAccess.Write);
-            Output = new StreamWriter(fileStream, Encoding.ASCII) {
+            stream = new FileStream(stdHandle, FileAccess.Write);
+            Output = new StreamWriter(stream, Encoding.ASCII) {
                 AutoFlush = true,
             };
+        }
+
+        public static string ReadLine(bool intercept = false) {
+            using(StreamReader reader = new StreamReader(stream)) {
+                return reader.ReadLine();
+            }
         }
 
         public static void Log(object message, string prefix = "INFO") {

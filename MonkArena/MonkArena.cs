@@ -12,6 +12,8 @@ namespace MonkArena {
         public string Revision { get; } = "1";
         #endregion
 
+        MonkArenaScript script;
+
         public MonkArena() {
             author = "Little Tiny Big";
             ModID = "MonkArena";
@@ -24,37 +26,15 @@ namespace MonkArena {
             Debug.Log("------------------------------------------------------------INITIALIZING LOGGER");
             RWConsole.Initialize();
 
+            GameObject scriptObject = new GameObject();
+            script = scriptObject.AddComponent<MonkArenaScript>();
+            script = new MonkArenaScript();
+
             On.Player.Update += Player_Update;
-        }
-
-        private void Server_MessageReceivedEvent(Received data) {
-            RWConsole.LogInfo($"{data.Sender}: {data.Message}");
-            Network.Server.Reply("received", data.Sender);
-            Network.Server.StartReceive();
-        }
-
-        private void Me_MessageReceivedEvent(Received data) {
-            RWConsole.LogInfo($"{data.Sender}: {data.Message}");
-            Network.Me.StartReceive();
         }
 
         private void Player_Update(On.Player.orig_Update orig, Player self, bool eu) {
             orig(self, eu);
-
-            if (Input.GetKeyUp(KeyCode.S)) {
-                Network.SetupServer();
-                Network.Server.MessageReceivedEvent += Server_MessageReceivedEvent;
-            }
-
-            if (Input.GetKeyUp(KeyCode.C)) {
-                Network.SetupClient("127.0.0.1");
-                Network.Me.MessageReceivedEvent += Me_MessageReceivedEvent;
-            }
-
-            if (Network.Connected) {
-                if (Input.GetKeyDown(KeyCode.Space))
-                    Network.SendMessage("test");
-            }
         }
 
         public override void OnDisable() {

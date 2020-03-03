@@ -12,6 +12,7 @@ namespace MonkArena {
         public static UdpUser Me { get; private set; }
         public static bool Connected { get; private set; }
         public static bool IsServer { get; private set; }
+        public static bool IsClient { get; private set; }
 
         static Network() {
         }
@@ -26,6 +27,7 @@ namespace MonkArena {
             RWConsole.LogInfo("Attempting connection to " + address);
             Me = UdpUser.ConnectTo(address, 19000);
             Me.StartReceive();
+            IsClient = true;
             Connected = true;
         }
 

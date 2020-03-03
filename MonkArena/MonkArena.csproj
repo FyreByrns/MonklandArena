@@ -54,6 +54,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="MonkArenaScript.cs" />
     <Compile Include="RWConsole.cs" />
     <Compile Include="MonkArena.cs" />
     <Compile Include="Network.cs" />

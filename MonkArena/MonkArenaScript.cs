@@ -8,6 +8,8 @@ using static MonkArena.Network;
 
 namespace MonkArena {
     public class MonkArenaScript : MonoBehaviour {
+        static RainWorldGame game = FindObjectOfType<RainWorld>()?.processManager?.currentMainLoop as RainWorldGame;
+
         public void Update() {
             if (Input.GetKeyUp(KeyCode.S)) {
                 Network.SetupServer();
@@ -26,13 +28,18 @@ namespace MonkArena {
         }
 
         private void Server_MessageReceivedEvent(Received data) {
-            Server.StartReceive();
+            Server.StartReceive(); // Start listening again immediately
+
             RWConsole.LogInfo($"{data.Sender}: {data.Message}");
             Message m = new Message(data.Message);
 
             Server.Reply(new Message("received", "", m.Token), data.Sender);
 
-            if (!ConnectedClients.ContainsKey(data.Sender)) ConnectedClients[data.Sender] = new PlayerInfo();
+            if (!ConnectedClients.ContainsKey(data.Sender)) {
+                ConnectedClients[data.Sender] = new PlayerInfo {
+                    Player = new Player(new AbstractCreature(game.world, null, null, game.Players[0].pos, new EntityID(-1, 10)), game.world)
+                };
+            }
 
             Message receivedMessage = new Message(data.Message);
 
@@ -64,7 +71,8 @@ namespace MonkArena {
         }
 
         private void Client_MessageReceivedEvent(Received data) {
-            Client.StartReceive();
+            Client.StartReceive(); // Start listening again immediately
+
             if (!IsServer) RWConsole.LogInfo($"{data.Sender}: {data.Message}");
 
             RWConsole.LogInfo($"{Network.UnreceivedMessages.Count} messages not received by server.");

@@ -33,6 +33,13 @@ namespace MonkArena {
                 lastPosition = playerObject.bodyChunks[0].pos;
                 Network.SendMessage(new Message("player_position", Message.GenerateToken(), $"{lastPosition.x},{lastPosition.y}"));
             }
+
+            if (Input.GetKeyUp(KeyCode.T)) {
+                try {
+                    Network.ConnectedClients.FirstOrDefault().Value.Player.abstractCreature.RealizeInRoom();
+                }
+                catch (Exception e) { RWConsole.LogError(e); }
+            }
         }
 
         private static void Player_UpdateAnimation(On.Player.orig_UpdateAnimation orig, Player self) {

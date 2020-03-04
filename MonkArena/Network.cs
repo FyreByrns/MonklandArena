@@ -80,7 +80,7 @@ namespace MonkArena {
             Connected = true;
 
             RWConsole.LogInfo("Sending handshake...");
-            Client.Send(Message.FromString("handshake"));
+            Client.Send(new Message("handshake", Message.GenerateToken(), ""));
         }
 
         private static void Client_MessageReceivedEvent(Received data) {

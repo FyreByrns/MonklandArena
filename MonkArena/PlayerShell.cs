@@ -8,7 +8,7 @@ namespace MonkArena {
     public class PlayerShell : UpdatableAndDeletable, IDrawable {
         public PlayerGraphics Graphics { get; set; }
 
-        public PlayerShell(Network.PlayerInfo info) {
+        public PlayerShell(ref Network.PlayerInfo info) {
             Graphics = new PlayerGraphics(info.Player);
             info.Shell = this;
         }

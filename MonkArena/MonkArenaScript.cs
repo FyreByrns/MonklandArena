@@ -52,8 +52,10 @@ namespace MonkArena {
 
             switch (receivedMessage.Type) {
                 case "player_animation":
-                    if (int.TryParse(receivedMessage.Contents, out int result))
+                    if (int.TryParse(receivedMessage.Contents, out int result)) {
                         ConnectedClients[data.Sender].Animation = (Player.AnimationIndex)result;
+                        ConnectedClients[data.Sender].Shell.Graphics.Update();
+                    }
                     else RWConsole.LogError($"Bad animation string: {receivedMessage.Contents}");
                     break;
                 case "player_position":

@@ -8,15 +8,31 @@ using static MonkArena.Network;
 
 namespace MonkArena {
     public class MonkArenaScript : MonoBehaviour {
+        public static MonkArenaScript Instance { get; private set; }
         static RainWorldGame game = FindObjectOfType<RainWorld>()?.processManager?.currentMainLoop as RainWorldGame;
 
+        public MonkArenaScript() {
+            Instance = this;
+        }
+
+        public void SpawnPlayer(System.Net.IPEndPoint endPoint) {
+            Player player = game.Players[0].realizedCreature as Player;
+
+            AbstractCreature abstractCreature = new AbstractCreature
+                (player.room.world, StaticWorld.GetCreatureTemplate(CreatureTemplate.Type.Slugcat), null,
+                player.abstractCreature.pos, player.room.game.GetNewID());
+            abstractCreature.RealizeInRoom();
+
+            ConnectedClients[endPoint].Player = (Player)abstractCreature.realizedCreature;
+        }
+
         public void Update() {
-            if (Input.GetKeyUp(KeyCode.S)) {
+            if (Input.GetKeyUp(KeyCode.S) && !IsServer && !IsClient) {
                 Network.SetupServer();
                 Network.Server.MessageReceivedEvent += Server_MessageReceivedEvent;
             }
 
-            if (Input.GetKeyUp(KeyCode.C)) {
+            if (Input.GetKeyUp(KeyCode.C) && !IsServer && !IsClient) {
                 Network.SetupClient("127.0.0.1");
                 Network.Client.MessageReceivedEvent += Client_MessageReceivedEvent;
             }
@@ -24,6 +40,8 @@ namespace MonkArena {
             if (Network.Connected || Network.IsServer) {
                 if (Input.GetKeyDown(KeyCode.Space))
                     Network.SendString("test");
+
+                //if (Input.GetKeyUp(KeyCode.T)) SpawnPlayer(ConnectedClients.Keys.First());
             }
         }
 
@@ -36,9 +54,9 @@ namespace MonkArena {
             Server.Reply(new Message("received", "", m.Token), data.Sender);
 
             if (!ConnectedClients.ContainsKey(data.Sender)) {
-                ConnectedClients[data.Sender] = new PlayerInfo {
-                    Player = new Player(new AbstractCreature(game.world, null, null, game.Players[0].pos, new EntityID(-1, 10)), game.world)
-                };
+                RWConsole.LogInfo("Creating PlayerInfo...");
+                ConnectedClients[data.Sender] = new PlayerInfo();
+                SpawnPlayer(data.Sender);
             }
 
             Message receivedMessage = new Message(data.Message);

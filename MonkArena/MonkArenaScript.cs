@@ -30,6 +30,10 @@ namespace MonkArena {
                 if (Input.GetKeyDown(KeyCode.Space))
                     Network.SendString("test");
             }
+
+            foreach(var ipep in ConnectedClients.Keys) {
+                ConnectedClients[ipep].Shell.Graphics.Update();
+            }
         }
 
         private void Server_MessageReceivedEvent(Received data) {
@@ -54,7 +58,6 @@ namespace MonkArena {
                 case "player_animation":
                     if (int.TryParse(receivedMessage.Contents, out int result)) {
                         ConnectedClients[data.Sender].Animation = (Player.AnimationIndex)result;
-                        ConnectedClients[data.Sender].Shell.Graphics.Update();
                     }
                     else RWConsole.LogError($"Bad animation string: {receivedMessage.Contents}");
                     break;

@@ -59,8 +59,9 @@ namespace MonkArena {
                     break;
                 case "player_position":
                     string[] pos = receivedMessage.Contents.Split(',');
-                    if (float.TryParse(pos[0], out float x) && float.TryParse(pos[1], out float y))
+                    if (float.TryParse(pos[0], out float x) && float.TryParse(pos[1], out float y)) {
                         ConnectedClients[data.Sender].Creature.bodyChunks[0].pos = new UnityEngine.Vector2(x, y);
+                    }
                     else RWConsole.LogError($"Bad position string: {receivedMessage.Contents}");
                     break;
 

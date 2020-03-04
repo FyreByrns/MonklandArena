@@ -16,6 +16,7 @@ namespace MonkArena {
         public override void Update(bool eu) {
             base.Update(eu);
 
+            RWConsole.LogInfo("PlayerShell updating");
             Graphics.Update();
         }
 

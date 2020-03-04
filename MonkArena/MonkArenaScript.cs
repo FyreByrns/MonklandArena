@@ -15,17 +15,6 @@ namespace MonkArena {
             Instance = this;
         }
 
-        public void SpawnPlayer(System.Net.IPEndPoint endPoint) {
-            Player player = game.Players[0].realizedCreature as Player;
-
-            AbstractCreature abstractCreature = new AbstractCreature
-                (player.room.world, StaticWorld.GetCreatureTemplate(CreatureTemplate.Type.Slugcat), null,
-                player.abstractCreature.pos, player.room.game.GetNewID());
-            abstractCreature.RealizeInRoom();
-
-            ConnectedClients[endPoint].Player = (Player)abstractCreature.realizedCreature;
-        }
-
         public void Update() {
             if (Input.GetKeyUp(KeyCode.S) && !IsServer && !IsClient) {
                 Network.SetupServer();
@@ -40,8 +29,6 @@ namespace MonkArena {
             if (Network.Connected || Network.IsServer) {
                 if (Input.GetKeyDown(KeyCode.Space))
                     Network.SendString("test");
-
-                //if (Input.GetKeyUp(KeyCode.T)) SpawnPlayer(ConnectedClients.Keys.First());
             }
         }
 
@@ -56,7 +43,6 @@ namespace MonkArena {
             if (!ConnectedClients.ContainsKey(data.Sender)) {
                 RWConsole.LogInfo("Creating PlayerInfo...");
                 ConnectedClients[data.Sender] = new PlayerInfo();
-                SpawnPlayer(data.Sender);
             }
 
             Message receivedMessage = new Message(data.Message);

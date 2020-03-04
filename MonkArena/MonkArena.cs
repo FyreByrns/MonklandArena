@@ -33,7 +33,7 @@ namespace MonkArena {
             AppDomain.CurrentDomain.ProcessExit += CurrentDomain_ProcessExit;
             On.RainWorldGame.ExitGame += RainWorldGame_ExitGame;
 
-            PlayerHooks.Hook();
+            PlayerManager.Hook();
         }
 
         private void RainWorldGame_ExitGame(On.RainWorldGame.orig_ExitGame orig, RainWorldGame self, bool asDeath, bool asQuit) {

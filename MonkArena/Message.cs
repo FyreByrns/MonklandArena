@@ -18,6 +18,11 @@ namespace MonkArena {
             Token = data[1];
             Contents = data[2];
         }
+        public Message(string type, string token, string contents) {
+            Type = type;
+            Token = token;
+            Contents = contents;
+        }
 
         public static Message FromString(string s) => new Message() { Type = "string", Token = GenerateToken(), Contents = s };
         public static Message FromInt(int i) => new Message() { Type = "int", Token = GenerateToken(), Contents = $"{i}" };
@@ -27,7 +32,7 @@ namespace MonkArena {
 
         static int tokenLength = 20;
         static Random rng = new Random();
-        static string GenerateToken() {
+        public static string GenerateToken() {
             StringBuilder tokenBuilder = new StringBuilder();
             for (int i = 0; i < tokenLength; i++)
                 tokenBuilder.Append((char)rng.Next('A', 'Z'));

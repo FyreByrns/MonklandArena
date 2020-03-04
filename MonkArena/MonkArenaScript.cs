@@ -26,11 +26,11 @@ namespace MonkArena {
         }
 
         private void Server_MessageReceivedEvent(Received data) {
-            Network.Server.StartReceive();
+            Server.StartReceive();
             RWConsole.LogInfo($"{data.Sender}: {data.Message}");
-
             Message m = new Message(data.Message);
-            Network.Server.Reply(new Message("received", "", m.Token), data.Sender);
+
+            Server.Reply(new Message("received", "", m.Token), data.Sender);
 
             if (!ConnectedClients.ContainsKey(data.Sender)) ConnectedClients[data.Sender] = new PlayerInfo();
 
@@ -64,13 +64,13 @@ namespace MonkArena {
         }
 
         private void Client_MessageReceivedEvent(Received data) {
-            if (!Network.IsServer) RWConsole.LogInfo($"{data.Sender}: {data.Message}");
+            Client.StartReceive();
+            if (!IsServer) RWConsole.LogInfo($"{data.Sender}: {data.Message}");
 
             RWConsole.LogInfo($"{Network.UnreceivedMessages.Count} messages not received by server.");
             Message m = new Message(data.Message);
             if (m.Type == "received")
-                Network.UnreceivedMessages.Remove(m.Contents);
-            Network.Client.StartReceive();
+                UnreceivedMessages.Remove(m.Contents);
         }
     }
 }

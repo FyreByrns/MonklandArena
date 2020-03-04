@@ -29,7 +29,7 @@ namespace MonkArena {
                 Network.SendMessage(new Message("player_animation", Message.GenerateToken(), $"{(int)oldAnimation}"));
             }
 
-            if (Vector2.Distance(playerObject.bodyChunks[0].pos, lastPosition) > 2) { // If the position has changed, notify the server.
+            if (Vector2.Distance(playerObject.bodyChunks[0].pos, lastPosition) > 10) { // If the position has changed, notify the server.
                 lastPosition = playerObject.bodyChunks[0].pos;
                 Network.SendMessage(new Message("player_position", Message.GenerateToken(), $"{lastPosition.x},{lastPosition.y}"));
             }

@@ -31,40 +31,8 @@ namespace MonkArena {
             ConnectedClients = new Dictionary<IPEndPoint, PlayerInfo>();
 
             Server = new UdpListener();
-            Server.MessageReceivedEvent += Server_MessageReceivedEvent;
             Server.StartReceive();
             IsServer = true;
-        }
-
-        private static void Server_MessageReceivedEvent(Received data) {
-            if (!ConnectedClients.ContainsKey(data.Sender)) ConnectedClients[data.Sender] = new PlayerInfo();
-
-            Message receivedMessage = new Message(data.Message);
-
-            switch (receivedMessage.Type) {
-                case "player_animation":
-                    if (int.TryParse(receivedMessage.Contents, out int result))
-                        ConnectedClients[data.Sender].Animation = (Player.AnimationIndex)result;
-                    else RWConsole.LogError($"Bad animation string: {receivedMessage.Contents}");
-                    break;
-                case "player_position":
-                    string[] pos = receivedMessage.Contents.Split(',');
-                    if (float.TryParse(pos[0], out float x) && float.TryParse(pos[1], out float y))
-                        ConnectedClients[data.Sender].Creature.bodyChunks[0].pos = new UnityEngine.Vector2(x, y);
-                    else RWConsole.LogError($"Bad position string: {receivedMessage.Contents}");
-                    break;
-
-                case "received":
-                    UnreceivedMessages.Remove(receivedMessage.Contents);
-                    break;
-                case "handshake":
-                    SendMessageTo(new Message("handshake_approved", "", ""), data.Sender);
-                    break;
-
-                default:
-                    RWConsole.LogError($"Unable to handle message of type: {receivedMessage.Type} with contents: {receivedMessage.Contents}");
-                    break;
-            }
         }
         #endregion
 
@@ -74,19 +42,12 @@ namespace MonkArena {
             UnreceivedMessages = new Dictionary<string, Message>();
 
             Client = UdpUser.ConnectTo(address, 19000);
-            Client.MessageReceivedEvent += Client_MessageReceivedEvent;
             Client.StartReceive();
             IsClient = true;
             Connected = true;
 
             RWConsole.LogInfo("Sending handshake...");
             Client.Send(new Message("handshake", Message.GenerateToken(), ""));
-        }
-
-        private static void Client_MessageReceivedEvent(Received data) {
-            Message m = new Message(data.Message);
-            if (m.Type == "received")
-                UnreceivedMessages.Remove(m.Contents);
         }
         #endregion
 

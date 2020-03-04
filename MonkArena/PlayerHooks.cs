@@ -36,7 +36,6 @@ namespace MonkArena {
         }
 
         private static void Player_UpdateAnimation(On.Player.orig_UpdateAnimation orig, Player self) {
-            throw new NotImplementedException();
         }
 
         private static void Player_checkInput(On.Player.orig_checkInput orig, Player self) {

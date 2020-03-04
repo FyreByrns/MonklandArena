@@ -30,10 +30,6 @@ namespace MonkArena {
                 if (Input.GetKeyDown(KeyCode.Space))
                     Network.SendString("test");
             }
-
-            foreach(var ipep in ConnectedClients.Keys) {
-                ConnectedClients[ipep].Shell.Graphics.Update();
-            }
         }
 
         private void Server_MessageReceivedEvent(Received data) {

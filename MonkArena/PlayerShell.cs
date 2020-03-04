@@ -13,6 +13,12 @@ namespace MonkArena {
             info.Shell = this;
         }
 
+        public override void Update(bool eu) {
+            base.Update(eu);
+
+            Graphics.Update();
+        }
+
         #region IDrawable
         public void AddToContainer(RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam, FContainer newContatiner) {
             Graphics.AddToContainer(sLeaser, rCam, newContatiner);

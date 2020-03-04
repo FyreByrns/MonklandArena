@@ -10,6 +10,7 @@ namespace MonkArena {
 
         public PlayerShell(Network.PlayerInfo info) {
             Graphics = new PlayerGraphics(info.Player);
+            info.Shell = this;
         }
 
         #region IDrawable

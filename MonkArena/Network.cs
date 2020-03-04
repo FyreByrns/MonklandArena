@@ -38,6 +38,26 @@ namespace MonkArena {
 
         private static void Server_MessageReceivedEvent(Received data) {
             if (!ConnectedClients.ContainsKey(data.Sender)) ConnectedClients[data.Sender] = new PlayerInfo();
+
+            Message receivedMessage = new Message(data.Message);
+
+            switch (receivedMessage.Type) {
+                case "player_animation":
+                    if (int.TryParse(receivedMessage.Contents, out int result))
+                        ConnectedClients[data.Sender].Animation = (Player.AnimationIndex)result;
+                    else RWConsole.LogError($"Bad animation string: {receivedMessage.Contents}");
+                    break;
+                case "player_position":
+                    string[] pos = receivedMessage.Contents.Split(',');
+                    if (float.TryParse(pos[0], out float x) && float.TryParse(pos[1], out float y))
+                        ConnectedClients[data.Sender].Creature.bodyChunks[0].pos = new UnityEngine.Vector2(x, y);
+                    else RWConsole.LogError($"Bad position string: {receivedMessage.Contents}");
+                    break;
+
+                default:
+                    RWConsole.LogError($"Unable to handle message of type: {receivedMessage.Type} with contents: {receivedMessage.Contents}");
+                    break;
+            }
         }
         #endregion
 
@@ -95,7 +115,7 @@ namespace MonkArena {
             }
         }
 
-        public struct PlayerInfo {
+        public class PlayerInfo {
             public string Username { get; set; }
 
             public bool Alive => !Creature.dead;
@@ -109,6 +129,7 @@ namespace MonkArena {
         }
     }
 
+    #region Networking Code
     public struct Received {
         public IPEndPoint Sender { get; set; }
         public string Message { get; set; }
@@ -191,4 +212,5 @@ namespace MonkArena {
             Client.Send(datagram, datagram.Length);
         }
     }
+    #endregion
 }

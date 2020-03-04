@@ -43,6 +43,9 @@ namespace MonkArena {
             if (!ConnectedClients.ContainsKey(data.Sender)) {
                 RWConsole.LogInfo("Creating PlayerInfo...");
                 ConnectedClients[data.Sender] = new PlayerInfo();
+
+                PlayerShell playerShell = new PlayerShell(ConnectedClients[data.Sender]);
+                game.Players[0].Room.realizedRoom.AddObject(playerShell);
             }
 
             Message receivedMessage = new Message(data.Message);

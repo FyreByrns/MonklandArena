@@ -29,10 +29,15 @@ namespace MonkArena {
                 Network.SendMessage(new Message("player_animation", Message.GenerateToken(), $"{(int)oldAnimation}"));
             }
 
-            if (Vector2.Distance(playerObject.bodyChunks[0].pos, lastPosition) > 20) { // If the position has changed enough, notify the server.
-                lastPosition = playerObject.bodyChunks[0].pos;
-                Network.SendMessage(new Message("player_position", Message.GenerateToken(), $"{lastPosition.x},{lastPosition.y}"));
+            //if (Vector2.Distance(playerObject.bodyChunks[0].pos, lastPosition) > 20) { // If the position has changed enough, notify the server.
+            //    lastPosition = playerObject.bodyChunks[0].pos;
+            //    Network.SendMessage(new Message("player_position", Message.GenerateToken(), $"{lastPosition.x},{lastPosition.y}"));
+
+            for (int i = 0; i < playerObject.bodyChunks.Length; i++) {
+                BodyChunk current = playerObject.bodyChunks[i];
+                Network.SendMessage(new Message("player_chunkposition", Message.GenerateToken(), $"{i}|{current.pos.x},{current.pos.y}"));
             }
+            //}
         }
 
         private static void Player_UpdateAnimation(On.Player.orig_UpdateAnimation orig, Player self) {

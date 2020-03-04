@@ -92,6 +92,12 @@ namespace MonkArena {
                     else RWConsole.LogError($"Bad position string: {receivedMessage.Contents}");
                     break;
 
+                case "player_chunkposition":
+                    string[] stuff = receivedMessage.Contents.Split('|', ',');
+                    ConnectedClients[data.Sender].Creature.bodyChunks[int.Parse(stuff[0])].pos = new Vector2
+                        (float.Parse(stuff[1]), float.Parse(stuff[2]));
+                    break;
+
                 case "received":
                     UnreceivedMessages.Remove(receivedMessage.Contents);
                     break;

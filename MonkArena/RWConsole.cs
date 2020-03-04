@@ -20,7 +20,7 @@ namespace MonkArena {
                 AutoFlush = true,
             };
 
-            Application.RegisterLogCallback(new UnityEngine.Application.LogCallback(LogUnityError));
+            Application.RegisterLogCallback(new Application.LogCallback(LogUnityError));
         }
 
         public static string ReadLine(bool intercept = false) {

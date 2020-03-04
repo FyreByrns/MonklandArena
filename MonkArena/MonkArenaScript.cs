@@ -9,7 +9,7 @@ using static MonkArena.Network;
 namespace MonkArena {
     public class MonkArenaScript : MonoBehaviour {
         public static MonkArenaScript Instance { get; private set; }
-        static RainWorldGame game = FindObjectOfType<RainWorld>()?.processManager?.currentMainLoop as RainWorldGame;
+        static RainWorldGame Game => FindObjectOfType<RainWorld>()?.processManager?.currentMainLoop as RainWorldGame;
 
         public MonkArenaScript() {
             Instance = this;
@@ -44,14 +44,34 @@ namespace MonkArena {
                 RWConsole.LogInfo("Creating PlayerInfo...");
                 ConnectedClients[data.Sender] = new PlayerInfo();
 
-                AbstractCreature abstractPlayer = new AbstractCreature
-                    (game.world, StaticWorld.GetCreatureTemplate(CreatureTemplate.Type.Slugcat), null, new WorldCoordinate(), new EntityID());
-                abstractPlayer.Realize();
-                ConnectedClients[data.Sender].Player = abstractPlayer.realizedCreature as Player;
-                if (ConnectedClients[data.Sender].Player == null) RWConsole.LogError("Player is null!");
+                RWConsole.LogInfo("Creating abstract player...");
+                AbstractCreature abstractPlayer = null;
+                try {
+                    abstractPlayer = new AbstractCreature
+                        (Game.world, StaticWorld.GetCreatureTemplate(CreatureTemplate.Type.Slugcat), null, new WorldCoordinate(), new EntityID());
+                }
+                catch (Exception e) {
+                    if (Game == null) RWConsole.LogError("Game is null!");
+                    RWConsole.LogError(e);
+                }
+                RWConsole.LogInfo("Created abstract player.");
+
+                RWConsole.LogInfo("Creating PlayerState...");
+                PlayerState playerState = new PlayerState(abstractPlayer, 0, 1, false);
+                abstractPlayer.state = playerState;
+                RWConsole.LogInfo("Created PlayerState.");
+
+                RWConsole.LogInfo("Realizing player...");
+                try {
+                    abstractPlayer?.Realize();
+                    ConnectedClients[data.Sender].Player = abstractPlayer?.realizedCreature as Player;
+                    if (ConnectedClients[data.Sender].Player == null) RWConsole.LogError("Player is null!");
+                }
+                catch (Exception e) { RWConsole.LogError(e); }
+                RWConsole.LogInfo("Realized player.");
 
                 PlayerShell playerShell = new PlayerShell(ConnectedClients[data.Sender]);
-                game.Players[0].Room.realizedRoom.AddObject(playerShell);
+                Game.Players[0].Room.realizedRoom.AddObject(playerShell);
                 RWConsole.LogInfo("Created PlayerInfo");
             }
 

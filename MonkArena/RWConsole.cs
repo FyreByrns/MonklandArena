@@ -5,6 +5,7 @@ using System.Text;
 using System.Runtime.InteropServices;
 using Microsoft.Win32.SafeHandles;
 using System.IO;
+using UnityEngine;
 
 namespace MonkArena {
     public static class RWConsole {
@@ -18,6 +19,8 @@ namespace MonkArena {
             Output = new StreamWriter(stream, Encoding.ASCII) {
                 AutoFlush = true,
             };
+
+            Application.RegisterLogCallback(new UnityEngine.Application.LogCallback(LogUnityError));
         }
 
         public static string ReadLine(bool intercept = false) {
@@ -26,6 +29,9 @@ namespace MonkArena {
             }
         }
 
+        private static void LogUnityError(string condition, string stackTrace, LogType type) {
+            Log($"{condition}\n\t{stackTrace}", type.ToString());
+        }
         public static void Log(object message, string prefix = "INFO") {
             Output.WriteLine($"[{prefix}][{DateTime.UtcNow}] {message}");
         }

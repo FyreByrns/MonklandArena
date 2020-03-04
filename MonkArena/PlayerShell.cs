@@ -9,10 +9,11 @@ namespace MonkArena {
         public PlayerGraphics Graphics { get; set; }
 
         public PlayerShell(Network.PlayerInfo info) {
-            RWConsole.LogInfo("Playershell being created.");
+            RWConsole.LogInfo("PlayerShell being created.");
 
             Graphics = new PlayerGraphics(info.Player);
             info.Shell = this;
+            RWConsole.LogInfo("PlayerShell created.");
         }
 
         public override void Update(bool eu) {

@@ -44,6 +44,12 @@ namespace MonkArena {
                 RWConsole.LogInfo("Creating PlayerInfo...");
                 ConnectedClients[data.Sender] = new PlayerInfo();
 
+                AbstractCreature abstractPlayer = new AbstractCreature
+                    (game.world, StaticWorld.GetCreatureTemplate(CreatureTemplate.Type.Slugcat), null, new WorldCoordinate(), new EntityID());
+                abstractPlayer.Realize();
+                ConnectedClients[data.Sender].Player = abstractPlayer.realizedCreature as Player;
+                if (ConnectedClients[data.Sender].Player == null) RWConsole.LogError("Player is null!");
+
                 PlayerShell playerShell = new PlayerShell(ConnectedClients[data.Sender]);
                 game.Players[0].Room.realizedRoom.AddObject(playerShell);
                 RWConsole.LogInfo("Created PlayerInfo");

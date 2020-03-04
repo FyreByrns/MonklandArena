@@ -93,6 +93,7 @@ namespace MonkArena {
             public bool Dead => !Alive;
 
             public Player Player { get; set; }
+            public PlayerShell Shell { get; set; }
             public Creature Creature => Player;
 
             public Player.AnimationIndex Animation { get => Player.animation; set { Player.animation = value; } }

@@ -54,6 +54,13 @@ namespace MonkArena {
                     else RWConsole.LogError($"Bad position string: {receivedMessage.Contents}");
                     break;
 
+                case "received":
+                    UnreceivedMessages.Remove(receivedMessage.Contents);
+                    break;
+                case "handshake":
+                    SendMessageTo(new Message("handshake_approved", "", ""), data.Sender);
+                    break;
+
                 default:
                     RWConsole.LogError($"Unable to handle message of type: {receivedMessage.Type} with contents: {receivedMessage.Contents}");
                     break;
@@ -77,10 +84,9 @@ namespace MonkArena {
         }
 
         private static void Client_MessageReceivedEvent(Received data) {
-            if (data.Message.Contains("received:")) {
-                string token = data.Message.Split(new[] { "received:" }, StringSplitOptions.RemoveEmptyEntries)[1];
-                UnreceivedMessages.Remove(token);
-            }
+            Message m = new Message(data.Message);
+            if (m.Type == "received")
+                UnreceivedMessages.Remove(m.Contents);
         }
         #endregion
 
@@ -113,6 +119,10 @@ namespace MonkArena {
                 UnreceivedMessages[message.Token] = message;
                 Client.Send(message);
             }
+        }
+        public static void SendMessageTo(Message message, IPEndPoint to) {
+            if (!IsServer) return;
+            Server.Reply(message, to);
         }
 
         public class PlayerInfo {

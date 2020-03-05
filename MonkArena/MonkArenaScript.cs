@@ -113,23 +113,20 @@ namespace MonkArena {
         private void Server_MessageReceivedEvent(Received data) {
             Server.StartReceive(); // Start listening again immediately
 
+            Message receivedMessage = data.Message;
             //RWConsole.LogInfo($"{data.Sender}: {data.Message}");
-            Message m = new Message(data.Message);
-
             CreateShellServerside(data.Sender);
 
-            Server.Reply(new Message("received", "", m.Token), data.Sender);
-
-            Message receivedMessage = new Message(data.Message);
+            Server.Reply(new Message(MessageType.Received, "", receivedMessage.Token), data.Sender);
 
             switch (receivedMessage.Type) {
-                case "player_animation":
+                case MessageType.PlayerAnimation:
                     if (int.TryParse(receivedMessage.Contents, out int result)) {
                         ConnectedClients[data.Sender].Animation = (Player.AnimationIndex)result;
                     }
                     else RWConsole.LogError($"Bad animation string: {receivedMessage.Contents}");
                     break;
-                case "player_chunkposition":
+                case MessageType.PlayerChunkPosition:
                     string[] pos = receivedMessage.Contents.Split('|', ',');
 
                     if (!int.TryParse(pos[0], out int chunkIndex)) RWConsole.LogError("Bad chunkindex");
@@ -141,16 +138,16 @@ namespace MonkArena {
                     ConnectedClients[data.Sender].Creature.bodyChunks[chunkIndex].pos = chunkPosition;
 
                     SendMessageExclusive(new Message(
-                        "remoteplayer_chunkposition", "", $"{ConnectedClients[data.Sender].Username}|{chunkIndex}|{chunkPosition.x},{chunkPosition.y}"
+                        MessageType.RemotePlayerChunkPosition, "", $"{ConnectedClients[data.Sender].Username}|{chunkIndex}|{chunkPosition.x},{chunkPosition.y}"
                         ),
                         data.Sender);
                     break;
 
-                case "received":
+                case MessageType.Received:
                     UnreceivedMessages.Remove(receivedMessage.Contents);
                     break;
-                case "handshake":
-                    SendMessageTo(new Message("handshake_approved", "", ""), data.Sender);
+                case MessageType.Handshake:
+                    SendMessageTo(new Message(MessageType.HandshakeAck, "", ""), data.Sender);
                     break;
 
                 default:
@@ -165,14 +162,14 @@ namespace MonkArena {
             //if (!IsServer) RWConsole.LogInfo($"{data.Sender}: {data.Message}");
             //RWConsole.LogInfo($"{Network.UnreceivedMessages.Count} messages not received by server.");
 
-            Message receivedMessage = new Message(data.Message);
+            Message receivedMessage = data.Message;
 
             switch (receivedMessage.Type) {
-                case "received":
+                case MessageType.Received:
                     UnreceivedMessages.Remove(receivedMessage.Contents);
                     break;
 
-                case "remoteplayer_chunkposition":
+                case MessageType.RemotePlayerChunkPosition:
                     string[] pos = receivedMessage.Contents.Split('|', ',');
 
                     string username = pos[0];

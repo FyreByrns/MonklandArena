@@ -29,7 +29,7 @@ namespace MonkArena {
 
             if (oldAnimation != self.animation) { // If the animation has changed, notify the server.
                 oldAnimation = self.animation;
-                Network.SendMessage(new Message("player_animation", Message.GenerateToken(), $"{(int)oldAnimation}"));
+                Network.SendMessage(new Message(MessageType.PlayerAnimation, Message.GenerateToken(), $"{(int)oldAnimation}"));
             }
 
             foreach (BodyChunk chunk in self.bodyChunks) {
@@ -39,10 +39,10 @@ namespace MonkArena {
                     int chunkIndex = self.bodyChunks.IndexOf(chunk);
 
                     if (Network.IsClient) {
-                        Network.SendMessage(new Message("player_chunkposition", Message.GenerateToken(), $"{chunkIndex}|{chunk.pos.x},{chunk.pos.y}"));
+                        Network.SendMessage(new Message(MessageType.PlayerChunkPosition, Message.GenerateToken(), $"{chunkIndex}|{chunk.pos.x},{chunk.pos.y}"));
                     }
                     else if (Network.IsServer) {
-                        Network.SendMessage(new Message("remoteplayer_chunkposition", "", $"server|{chunkIndex}|{chunk.pos.x},{chunk.pos.y}"));
+                        Network.SendMessage(new Message(MessageType.RemotePlayerChunkPosition, "", $"server|{chunkIndex}|{chunk.pos.x},{chunk.pos.y}"));
                     }
                 }
             }

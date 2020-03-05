@@ -5,7 +5,16 @@ using System.Text;
 
 namespace MonkArena {
     public enum MessageType : byte {
+        Handshake,
+        HandshakeAck,
 
+        Received,
+        Disconnect,
+        Chat,
+
+        PlayerAnimation,
+        PlayerChunkPosition,
+        RemotePlayerChunkPosition,
     }
 
     public class Message {
@@ -14,7 +23,13 @@ namespace MonkArena {
         public string Token { get; private set; }
         public string Contents { get; private set; }
 
+        /// <summary>
+        /// Byte length of Type
+        /// </summary>
         private const int TYPE_LENGTH = 1;
+        /// <summary>
+        /// Byte length of MessageLength
+        /// </summary>
         private const int LENGTH_LENGTH = 2;
 
         private Message() { }
@@ -47,7 +62,7 @@ namespace MonkArena {
         }
 
         public override string ToString() => $"{Type}:{Token}:{Contents}";
-        public byte[] GetSaveData() {
+        public byte[] GetData() {
             byte[] data = new byte[TYPE_LENGTH + LENGTH_LENGTH + MessageLength];
             int currentPosition = 0;
 

@@ -104,6 +104,16 @@ namespace MonkArena {
             if (!IsServer) return;
             Server.Reply(message, to);
         }
+        /// <summary>
+        /// [Serverside] Sends a message to all clients except one
+        /// </summary>
+        /// <param name="message"></param>
+        /// <param name="exclusion"></param>
+        public static void SendMessageExclusive(Message message, IPEndPoint exclusion) {
+            if (IsServer)
+                foreach (IPEndPoint ipep in ConnectedClients.Keys)
+                    if (ipep != exclusion) Server.Reply(message, ipep);
+        }
 
         /// <summary>
         /// Information relevant to networked players

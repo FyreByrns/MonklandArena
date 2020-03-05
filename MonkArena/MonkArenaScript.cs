@@ -28,13 +28,15 @@ namespace MonkArena {
         }
 
         /// <summary>
-        /// [Serverside] Creates a <see cref="PlayerShell"/>
+        /// [Serverside] Creates a <see cref="PlayerShell"/> with a random username
         /// </summary>
         /// <param name="sender"></param>
         private void CreateShellServerside(System.Net.IPEndPoint sender) {
             if (!ConnectedClients.ContainsKey(sender)) {
                 RWConsole.LogInfo("Creating PlayerInfo...");
-                ConnectedClients[sender] = new PlayerInfo();
+                ConnectedClients[sender] = new PlayerInfo() {
+                    Username = Message.GenerateToken()
+                };
 
                 RWConsole.LogInfo("Creating abstract player...");
                 AbstractCreature abstractPlayer = null;
@@ -133,6 +135,10 @@ namespace MonkArena {
                     Vector2 chunkPosition = new Vector2(float.Parse(pos[1]), float.Parse(pos[2]));
 
                     ConnectedClients[data.Sender].Creature.bodyChunks[chunkIndex].pos = chunkPosition;
+
+                    SendMessageExclusive(new Message
+                        ("remoteplayer_chunkposition", "", $"{ConnectedClients[data.Sender].Username}|{chunkIndex}|{chunkPosition.x},{chunkPosition.y}"),
+                        data.Sender);
                     break;
 
                 case "received":
@@ -168,11 +174,8 @@ namespace MonkArena {
                     int chunkIndex = int.Parse(pos[1]);
                     Vector2 chunkPosition = new Vector2(float.Parse(pos[2]), float.Parse(pos[3]));
 
-                    try {
-                        CreateShellClientside(username);
-                        RemotePlayers[username].Creature.bodyChunks[chunkIndex].pos = chunkPosition;
-                    }
-                    catch (Exception e) { RWConsole.LogError(e); }
+                    CreateShellClientside(username);
+                    RemotePlayers[username].Creature.bodyChunks[chunkIndex].pos = chunkPosition;
                     break;
 
                 default:

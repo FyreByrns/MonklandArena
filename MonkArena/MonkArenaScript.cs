@@ -129,7 +129,7 @@ namespace MonkArena {
 
                     if (!int.TryParse(pos[0], out int chunkIndex)) RWConsole.LogError("Bad chunkindex");
                     if (!float.TryParse(pos[1], out float x)) RWConsole.LogError("Bad chunkposition x");
-                    if (!float.TryParse(pos[1], out float y)) RWConsole.LogError("Bad chunkposition y");
+                    if (!float.TryParse(pos[2], out float y)) RWConsole.LogError("Bad chunkposition y");
 
                     chunkIndex = int.Parse(pos[0]);
                     Vector2 chunkPosition = new Vector2(x, y);

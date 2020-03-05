@@ -131,13 +131,18 @@ namespace MonkArena {
                     break;
                 case "player_chunkposition":
                     string[] pos = receivedMessage.Contents.Split('|', ',');
-                    int chunkIndex = int.Parse(pos[0]);
-                    Vector2 chunkPosition = new Vector2(float.Parse(pos[1]), float.Parse(pos[2]));
 
+                    if (!int.TryParse(pos[0], out int chunkIndex)) RWConsole.LogError("Bad chunkindex");
+                    if (!float.TryParse(pos[1], out float x)) RWConsole.LogError("Bad chunkposition x");
+                    if (!float.TryParse(pos[1], out float y)) RWConsole.LogError("Bad chunkposition y");
+
+                    chunkIndex = int.Parse(pos[0]);
+                    Vector2 chunkPosition = new Vector2(x, y);
                     ConnectedClients[data.Sender].Creature.bodyChunks[chunkIndex].pos = chunkPosition;
 
-                    SendMessageExclusive(new Message
-                        ("remoteplayer_chunkposition", "", $"{ConnectedClients[data.Sender].Username}|{chunkIndex}|{chunkPosition.x},{chunkPosition.y}"),
+                    SendMessageExclusive(new Message(
+                        "remoteplayer_chunkposition", "", $"{ConnectedClients[data.Sender].Username}|{chunkIndex}|{chunkPosition.x},{chunkPosition.y}"
+                        ),
                         data.Sender);
                     break;
 

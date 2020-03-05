@@ -22,13 +22,8 @@ namespace MonkArena {
             }
 
             if (Input.GetKeyUp(KeyCode.C) && !IsServer && !IsClient) {
-                Network.SetupClient("127.0.0.1");
+                Network.SetupClient(ServerIP, ServerPort);
                 Network.Client.MessageReceivedEvent += Client_MessageReceivedEvent;
-            }
-
-            if (Network.Connected || Network.IsServer) {
-                if (Input.GetKeyDown(KeyCode.Space))
-                    Network.SendString("test");
             }
         }
 

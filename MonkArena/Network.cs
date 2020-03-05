@@ -14,18 +14,37 @@ namespace MonkArena {
         public static bool IsServer { get; private set; }
         public static bool IsClient { get; private set; }
 
+        public static string ServerIP { get; set; } = "127.0.0.1";
+        public static int ServerPort { get; set; } = 19000;
+
+        /// <summary>
+        /// [Clientside] Set of server-controlled <see cref="PlayerInfo"/>s by username
+        /// </summary>
+        public static Dictionary<string, PlayerInfo> RemotePlayers { get; private set; }
+        /// <summary>
+        /// [Serverside] All <see cref="PlayerInfo"/>s for all connected clients by IP
+        /// </summary>
         public static Dictionary<IPEndPoint, PlayerInfo> ConnectedClients { get; private set; }
+        /// <summary>
+        /// [Clientside] <see cref="Message"/>s by token that the client has not received confirmation for
+        /// </summary>
         public static Dictionary<string, Message> UnreceivedMessages { get; private set; }
 
         static Network() {
         }
 
+        /// <summary>
+        /// Notifies of disconnection
+        /// </summary>
         public static void Disconnect() {
-            if (IsServer) SendString("Server shutting down.");
-            else if (IsClient) SendString("disconnect");
+            if (IsServer) SendMessage(new Message("disconnect", "", ""));
+            else if (IsClient) SendMessage(new Message("disconnect", Message.GenerateToken(), ""));
         }
 
         #region Server
+        /// <summary>
+        /// Makes the current instance of RainWorld a server.
+        /// </summary>
         public static void SetupServer() {
             RWConsole.LogInfo("Starting server...");
             ConnectedClients = new Dictionary<IPEndPoint, PlayerInfo>();
@@ -37,11 +56,16 @@ namespace MonkArena {
         #endregion
 
         #region Client
-        public static void SetupClient(string address) {
+        /// <summary>
+        /// Connects to the server.
+        /// </summary>
+        /// <param name="address">Server address</param>
+        /// <param name="port">Server port</param>
+        public static void SetupClient(string address, int port) {
             RWConsole.LogInfo("Attempting connection to " + address);
             UnreceivedMessages = new Dictionary<string, Message>();
 
-            Client = UdpUser.ConnectTo(address, 19000);
+            Client = UdpUser.ConnectTo(address, port);
             Client.StartReceive();
             IsClient = true;
             Connected = true;
@@ -51,22 +75,11 @@ namespace MonkArena {
         }
         #endregion
 
-        public static void SendString(string message) {
-            RWConsole.LogInfo("Attempting to send string " + message);
-            if (!Connected && !IsServer) {
-                RWConsole.LogError("Can't send when disconnected.");
-                return;
-            }
-
-            if (IsServer)
-                foreach (IPEndPoint ipep in ConnectedClients.Keys) Server.Reply(Message.FromString(message), ipep);
-            else {
-                Message m = Message.FromString(message);
-                UnreceivedMessages[m.Token] = m;
-                Client.Send(m);
-            }
-        }
-
+        /// <summary>
+        /// If you're a client, sends a message to the server.
+        /// If you're the server, sends a message to all clients.
+        /// </summary>
+        /// <param name="message"></param>
         public static void SendMessage(Message message) {
             RWConsole.LogInfo("Attempting to send message " + message.ToString());
             if (!Connected && !IsServer) {
@@ -81,6 +94,11 @@ namespace MonkArena {
                 Client.Send(message);
             }
         }
+        /// <summary>
+        /// Sends a message to a specific client.
+        /// </summary>
+        /// <param name="message"></param>
+        /// <param name="to"></param>
         public static void SendMessageTo(Message message, IPEndPoint to) {
             if (!IsServer) return;
             Server.Reply(message, to);

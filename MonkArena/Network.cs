@@ -25,10 +25,6 @@ namespace MonkArena {
         /// [Serverside] All <see cref="PlayerInfo"/>s for all connected clients by IP
         /// </summary>
         public static Dictionary<IPEndPoint, PlayerInfo> ConnectedClients { get; private set; }
-        /// <summary>
-        /// [Clientside] <see cref="Message"/>s by token that the client has not received confirmation for
-        /// </summary>
-        public static Dictionary<string, Message> UnreceivedMessages { get; private set; }
 
         static Network() {
         }
@@ -37,8 +33,8 @@ namespace MonkArena {
         /// Notifies of disconnection
         /// </summary>
         public static void Disconnect() {
-            if (IsServer) SendMessage(new Message("disconnect", "", ""));
-            else if (IsClient) SendMessage(new Message("disconnect", Message.GenerateToken(), ""));
+            if (IsServer) SendMessage(new Message(MessageType.Disconnect, ""));
+            else if (IsClient) SendMessage(new Message(MessageType.Disconnect, ""));
         }
 
         #region Server
@@ -63,7 +59,6 @@ namespace MonkArena {
         /// <param name="port">Server port</param>
         public static void SetupClient(string address, int port) {
             RWConsole.LogInfo("Attempting connection to " + address);
-            UnreceivedMessages = new Dictionary<string, Message>();
             RemotePlayers = new Dictionary<string, PlayerInfo>();
 
             Client = UdpUser.ConnectTo(address, port);
@@ -72,7 +67,7 @@ namespace MonkArena {
             Connected = true;
 
             RWConsole.LogInfo("Sending handshake...");
-            Client.Send(new Message("handshake", Message.GenerateToken(), ""));
+            Client.Send(new Message(MessageType.Handshake, ""));
         }
         #endregion
 
@@ -91,7 +86,6 @@ namespace MonkArena {
             if (IsServer)
                 foreach (IPEndPoint ipep in ConnectedClients.Keys) Server.Reply(message, ipep);
             else {
-                UnreceivedMessages[message.Token] = message;
                 Client.Send(message);
             }
         }
@@ -136,7 +130,7 @@ namespace MonkArena {
     #region Networking Code
     public struct Received {
         public IPEndPoint Sender { get; set; }
-        public string Message { get; set; }
+        public Message Message { get; set; }
     }
 
     public abstract class UdpBase {
@@ -161,9 +155,10 @@ namespace MonkArena {
             IPEndPoint e = ((UdpState)(ar.AsyncState)).e;
 
             byte[] receivedBytes = u.EndReceive(ar, ref e);
-            string receivedString = Encoding.ASCII.GetString(receivedBytes);
+            Message receivedMessage = new Message(receivedBytes);
+
             //RWConsole.LogInfo($"Received: {receivedString} From: {e}");
-            MessageReceivedEvent?.Invoke(new Received() { Sender = e, Message = receivedString });
+            MessageReceivedEvent?.Invoke(new Received() { Sender = e, Message = receivedMessage });
         }
     }
 
@@ -187,7 +182,7 @@ namespace MonkArena {
         }
 
         public void Reply(Message message, IPEndPoint endpoint) {
-            var datagram = Encoding.ASCII.GetBytes(message.ToString());
+            var datagram = message.GetData();
             Client.Send(datagram, datagram.Length, endpoint);
         }
     }
@@ -211,7 +206,7 @@ namespace MonkArena {
         }
 
         public void Send(Message message) {
-            var datagram = Encoding.ASCII.GetBytes(message.ToString());
+            var datagram = message.GetData();
             Client.Send(datagram, datagram.Length);
         }
     }

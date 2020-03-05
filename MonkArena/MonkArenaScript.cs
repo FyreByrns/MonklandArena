@@ -25,6 +25,10 @@ namespace MonkArena {
                 Network.SetupClient(ServerIP, ServerPort);
                 Network.Client.MessageReceivedEvent += Client_MessageReceivedEvent;
             }
+
+            if (IsServer)
+                foreach (System.Net.IPEndPoint ipep in ConnectedClients.Keys)
+                    ConnectedClients[ipep].Player.UpdateAnimation();
         }
 
         /// <summary>
@@ -135,7 +139,7 @@ namespace MonkArena {
                     Vector2 chunkPosition = new Vector2(x, y);
                     ConnectedClients[data.Sender].Creature.bodyChunks[chunkIndex].pos = chunkPosition;
 
-                    SendMessageExclusive(new Message(
+                    SendMessageExcluding(new Message(
                         MessageType.RemotePlayerChunkPosition, $"{ConnectedClients[data.Sender].Username}|{chunkIndex}|{chunkPosition.x},{chunkPosition.y}"
                         ),
                         data.Sender);

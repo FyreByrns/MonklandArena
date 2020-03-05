@@ -53,7 +53,7 @@ namespace MonkArena {
 
         #region Client
         /// <summary>
-        /// Connects to the server.
+        /// [Clientside] Connects to the server.
         /// </summary>
         /// <param name="address">Server address</param>
         /// <param name="port">Server port</param>
@@ -103,10 +103,10 @@ namespace MonkArena {
         /// </summary>
         /// <param name="message"></param>
         /// <param name="exclusion"></param>
-        public static void SendMessageExclusive(Message message, IPEndPoint exclusion) {
+        public static void SendMessageExcluding(Message message, IPEndPoint exclusion) {
             if (IsServer)
-                foreach (IPEndPoint ipep in ConnectedClients.Keys)
-                    if (ipep != exclusion) Server.Reply(message, ipep);
+                foreach (IPEndPoint ipep in ConnectedClients.Keys.Where(x => x != exclusion))
+                    Server.Reply(message, ipep);
         }
 
         /// <summary>

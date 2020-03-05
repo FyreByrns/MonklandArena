@@ -11,6 +11,10 @@ namespace MonkArena {
     public static class RWConsole {
         public static StreamWriter Output;
         static FileStream stream;
+        static object lastMessage;
+        static string backspaceOfLastMessage;
+
+        static int countOfLastMessage;
 
         public static void Initialize() {
             AllocConsole();
@@ -33,7 +37,14 @@ namespace MonkArena {
             Log($"{condition}\n\t{stackTrace}", type.ToString());
         }
         public static void Log(object message, string prefix = "INFO") {
-            Output.WriteLine($"[{prefix}][{DateTime.UtcNow}] {message}");
+            if (message == lastMessage) countOfLastMessage++;
+            else countOfLastMessage = 1;
+
+            string toConsole = $"{countOfLastMessage}x[{prefix}][{DateTime.UtcNow}] {message}";
+            backspaceOfLastMessage = new string('\b', toConsole.Length);
+
+            if (countOfLastMessage > 1) Output.WriteLine(backspaceOfLastMessage);
+            Output.WriteLine(toConsole);
         }
         public static void LogError(object message) {
             Log(message, "ERROR");

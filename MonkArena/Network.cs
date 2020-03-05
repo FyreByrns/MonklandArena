@@ -14,18 +14,37 @@ namespace MonkArena {
         public static bool IsServer { get; private set; }
         public static bool IsClient { get; private set; }
 
+        public static string ServerIP { get; set; } = "127.0.0.1";
+        public static int ServerPort { get; set; } = 19000;
+
+        /// <summary>
+        /// [Clientside] Set of server-controlled <see cref="PlayerInfo"/>s by username
+        /// </summary>
+        public static Dictionary<string, PlayerInfo> RemotePlayers { get; private set; }
+        /// <summary>
+        /// [Serverside] All <see cref="PlayerInfo"/>s for all connected clients by IP
+        /// </summary>
         public static Dictionary<IPEndPoint, PlayerInfo> ConnectedClients { get; private set; }
+        /// <summary>
+        /// [Clientside] <see cref="Message"/>s by token that the client has not received confirmation for
+        /// </summary>
         public static Dictionary<string, Message> UnreceivedMessages { get; private set; }
 
         static Network() {
         }
 
+        /// <summary>
+        /// Notifies of disconnection
+        /// </summary>
         public static void Disconnect() {
-            if (IsServer) SendString("Server shutting down.");
-            else if (IsClient) SendString("disconnect");
+            if (IsServer) SendMessage(new Message("disconnect", "", ""));
+            else if (IsClient) SendMessage(new Message("disconnect", Message.GenerateToken(), ""));
         }
 
         #region Server
+        /// <summary>
+        /// Makes the current instance of RainWorld a server.
+        /// </summary>
         public static void SetupServer() {
             RWConsole.LogInfo("Starting server...");
             ConnectedClients = new Dictionary<IPEndPoint, PlayerInfo>();
@@ -37,11 +56,17 @@ namespace MonkArena {
         #endregion
 
         #region Client
-        public static void SetupClient(string address) {
+        /// <summary>
+        /// Connects to the server.
+        /// </summary>
+        /// <param name="address">Server address</param>
+        /// <param name="port">Server port</param>
+        public static void SetupClient(string address, int port) {
             RWConsole.LogInfo("Attempting connection to " + address);
             UnreceivedMessages = new Dictionary<string, Message>();
+            RemotePlayers = new Dictionary<string, PlayerInfo>();
 
-            Client = UdpUser.ConnectTo(address, 19000);
+            Client = UdpUser.ConnectTo(address, port);
             Client.StartReceive();
             IsClient = true;
             Connected = true;
@@ -51,24 +76,13 @@ namespace MonkArena {
         }
         #endregion
 
-        public static void SendString(string message) {
-            RWConsole.LogInfo("Attempting to send string " + message);
-            if (!Connected && !IsServer) {
-                RWConsole.LogError("Can't send when disconnected.");
-                return;
-            }
-
-            if (IsServer)
-                foreach (IPEndPoint ipep in ConnectedClients.Keys) Server.Reply(Message.FromString(message), ipep);
-            else {
-                Message m = Message.FromString(message);
-                UnreceivedMessages[m.Token] = m;
-                Client.Send(m);
-            }
-        }
-
+        /// <summary>
+        /// <para>[Clientside] Sends a message to the server.</para>
+        /// <para>[Serverside] Sends a message to all clients.</para>
+        /// </summary>
+        /// <param name="message"></param>
         public static void SendMessage(Message message) {
-            RWConsole.LogInfo("Attempting to send message " + message.ToString());
+            //RWConsole.LogInfo("Attempting to send message " + message.ToString());
             if (!Connected && !IsServer) {
                 RWConsole.LogError("Can't send when disconnected.");
                 return;
@@ -81,11 +95,29 @@ namespace MonkArena {
                 Client.Send(message);
             }
         }
+        /// <summary>
+        /// [Serverside] Sends a message to a specific client.
+        /// </summary>
+        /// <param name="message"></param>
+        /// <param name="to"></param>
         public static void SendMessageTo(Message message, IPEndPoint to) {
             if (!IsServer) return;
             Server.Reply(message, to);
         }
+        /// <summary>
+        /// [Serverside] Sends a message to all clients except one
+        /// </summary>
+        /// <param name="message"></param>
+        /// <param name="exclusion"></param>
+        public static void SendMessageExclusive(Message message, IPEndPoint exclusion) {
+            if (IsServer)
+                foreach (IPEndPoint ipep in ConnectedClients.Keys)
+                    if (ipep != exclusion) Server.Reply(message, ipep);
+        }
 
+        /// <summary>
+        /// Information relevant to networked players
+        /// </summary>
         public class PlayerInfo {
             public string Username { get; set; }
 
@@ -93,6 +125,7 @@ namespace MonkArena {
             public bool Dead => !Alive;
 
             public Player Player { get; set; }
+            public PlayerShell Shell { get; set; }
             public Creature Creature => Player;
 
             public Player.AnimationIndex Animation { get => Player.animation; set { Player.animation = value; } }
@@ -129,8 +162,7 @@ namespace MonkArena {
 
             byte[] receivedBytes = u.EndReceive(ar, ref e);
             string receivedString = Encoding.ASCII.GetString(receivedBytes);
-
-            RWConsole.LogInfo($"Received: {receivedString} From: {e}");
+            //RWConsole.LogInfo($"Received: {receivedString} From: {e}");
             MessageReceivedEvent?.Invoke(new Received() { Sender = e, Message = receivedString });
         }
     }
@@ -138,7 +170,7 @@ namespace MonkArena {
     public class UdpListener : UdpBase {
         IPEndPoint listenOn;
 
-        public UdpListener() : this(new IPEndPoint(IPAddress.Any, 19000)) { }
+        public UdpListener() : this(new IPEndPoint(IPAddress.Any, Network.ServerPort)) { }
         public UdpListener(IPEndPoint endpoint) {
             listenOn = endpoint;
             Client = new UdpClient(listenOn);

@@ -57,6 +57,7 @@
     <Compile Include="Message.cs" />
     <Compile Include="MonkArenaScript.cs" />
     <Compile Include="PlayerHooks.cs" />
+    <Compile Include="PlayerShell.cs" />
     <Compile Include="RWConsole.cs" />
     <Compile Include="MonkArena.cs" />
     <Compile Include="Network.cs" />

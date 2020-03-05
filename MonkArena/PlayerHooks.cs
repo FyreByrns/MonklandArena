@@ -7,9 +7,12 @@ using UnityEngine;
 using InputPackage = Player.InputPackage;
 
 namespace MonkArena {
+    /// <summary>
+    /// Player management for the current RainWorld instance
+    /// </summary>
     public static class PlayerManager {
         static Player.AnimationIndex oldAnimation;
-        static Vector2 lastPosition;
+        static Dictionary<BodyChunk, Vector2> previousPositions = new Dictionary<BodyChunk, Vector2>();
 
         public static void Hook() {
             On.Player.checkInput += Player_checkInput;
@@ -29,9 +32,19 @@ namespace MonkArena {
                 Network.SendMessage(new Message("player_animation", Message.GenerateToken(), $"{(int)oldAnimation}"));
             }
 
-            if (Vector2.Distance(playerObject.bodyChunks[0].pos, lastPosition) > 20) { // If the position has changed enough, notify the server.
-                lastPosition = playerObject.bodyChunks[0].pos;
-                Network.SendMessage(new Message("player_position", Message.GenerateToken(), $"{lastPosition.x},{lastPosition.y}"));
+            foreach (BodyChunk chunk in self.bodyChunks) {
+                if (!previousPositions.ContainsKey(chunk)) previousPositions[chunk] = chunk.pos;
+                if (Vector2.Distance(chunk.pos, previousPositions[chunk]) > 0) { // If the position has changed enough, notify the server.
+                    previousPositions[chunk] = chunk.pos;
+                    int chunkIndex = self.bodyChunks.IndexOf(chunk);
+
+                    if (Network.IsClient) {
+                        Network.SendMessage(new Message("player_chunkposition", Message.GenerateToken(), $"{chunkIndex}|{chunk.pos.x},{chunk.pos.y}"));
+                    }
+                    else if (Network.IsServer) {
+                        Network.SendMessage(new Message("remoteplayer_chunkposition", "", $"server|{chunkIndex}|{chunk.pos.x},{chunk.pos.y}"));
+                    }
+                }
             }
         }
 

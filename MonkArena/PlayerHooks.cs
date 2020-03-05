@@ -35,7 +35,10 @@ namespace MonkArena {
 
             for (int i = 0; i < playerObject.bodyChunks.Length; i++) {
                 BodyChunk current = playerObject.bodyChunks[i];
-                Network.SendMessage(new Message("player_chunkposition", Message.GenerateToken(), $"{i}|{current.pos.x},{current.pos.y}"));
+                if (!Network.IsServer && Network.IsClient && Network.Connected)
+                    Network.SendMessage(new Message("player_chunkposition", Message.GenerateToken(), $"{i}|{current.pos.x},{current.pos.y}"));
+                if (Network.IsServer)
+                    Network.SendMessage(new Message("remoteplayer_chunkposition", "", $"{Network.Server.listenOn}|{i}|{current.pos.x},{current.pos.y}"));
             }
             //}
         }

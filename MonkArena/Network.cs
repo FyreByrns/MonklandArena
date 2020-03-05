@@ -15,6 +15,7 @@ namespace MonkArena {
         public static bool IsClient { get; private set; }
 
         public static Dictionary<IPEndPoint, PlayerInfo> ConnectedClients { get; private set; }
+        public static Dictionary<IPEndPoint, PlayerInfo> RemotePlayers { get; private set; }
         public static Dictionary<string, Message> UnreceivedMessages { get; private set; }
 
         static Network() {
@@ -137,7 +138,7 @@ namespace MonkArena {
     }
 
     public class UdpListener : UdpBase {
-        IPEndPoint listenOn;
+        public IPEndPoint listenOn;
 
         public UdpListener() : this(new IPEndPoint(IPAddress.Any, 19000)) { }
         public UdpListener(IPEndPoint endpoint) {

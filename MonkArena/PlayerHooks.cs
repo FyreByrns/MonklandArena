@@ -33,6 +33,7 @@ namespace MonkArena {
             }
 
             foreach (BodyChunk chunk in self.bodyChunks) {
+                if (!previousPositions.ContainsKey(chunk)) previousPositions[chunk] = chunk.pos;
                 if (Vector2.Distance(chunk.pos, previousPositions[chunk]) > 0) { // If the position has changed enough, notify the server.
                     previousPositions[chunk] = chunk.pos;
                     int chunkIndex = self.bodyChunks.IndexOf(chunk);
@@ -42,7 +43,7 @@ namespace MonkArena {
                     }
                     else if (Network.IsServer) {
                         Network.SendMessage(new Message("remoteplayer_chunkposition", "", $"server|{chunkIndex}|{chunk.pos.x},{chunk.pos.y}"));
-                     }
+                    }
                 }
             }
         }

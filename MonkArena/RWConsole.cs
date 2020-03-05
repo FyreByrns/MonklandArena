@@ -12,7 +12,6 @@ namespace MonkArena {
         public static StreamWriter Output;
         static FileStream stream;
         static object lastMessage;
-        static string backspaceOfLastMessage;
 
         static int countOfLastMessage;
 
@@ -28,23 +27,24 @@ namespace MonkArena {
         }
 
         public static string ReadLine(bool intercept = false) {
-            using(StreamReader reader = new StreamReader(stream)) {
+            using (StreamReader reader = new StreamReader(stream)) {
                 return reader.ReadLine();
             }
         }
 
         private static void LogUnityError(string condition, string stackTrace, LogType type) {
-            Log($"{condition}\n\t{stackTrace}", type.ToString());
+            Log($"{condition}\t{stackTrace}", type.ToString());
         }
         public static void Log(object message, string prefix = "INFO") {
             if (message == lastMessage) countOfLastMessage++;
-            else countOfLastMessage = 1;
+            else {
+                countOfLastMessage = 1;
+                Output.WriteLine();
+            }
+            lastMessage = message;
 
-            string toConsole = $"{countOfLastMessage}x[{prefix}][{DateTime.UtcNow}] {message}";
-            backspaceOfLastMessage = new string('\b', toConsole.Length);
-
-            if (countOfLastMessage > 1) Output.WriteLine(backspaceOfLastMessage);
-            Output.WriteLine(toConsole);
+            string toConsole = $"\r{countOfLastMessage}x[{prefix}][{DateTime.UtcNow}] {message}{(message == lastMessage ? " " : "\n")}";
+            Output.Write(toConsole);
         }
         public static void LogError(object message) {
             Log(message, "ERROR");

@@ -76,8 +76,8 @@ namespace MonkArena {
         #endregion
 
         /// <summary>
-        /// If you're a client, sends a message to the server.
-        /// If you're the server, sends a message to all clients.
+        /// <para>[Clientside] Sends a message to the server.</para>
+        /// <para>[Serverside] Sends a message to all clients.</para>
         /// </summary>
         /// <param name="message"></param>
         public static void SendMessage(Message message) {
@@ -95,7 +95,7 @@ namespace MonkArena {
             }
         }
         /// <summary>
-        /// Sends a message to a specific client.
+        /// [Serverside] Sends a message to a specific client.
         /// </summary>
         /// <param name="message"></param>
         /// <param name="to"></param>
@@ -104,6 +104,9 @@ namespace MonkArena {
             Server.Reply(message, to);
         }
 
+        /// <summary>
+        /// Information relevant to networked players
+        /// </summary>
         public class PlayerInfo {
             public string Username { get; set; }
 
@@ -157,7 +160,7 @@ namespace MonkArena {
     public class UdpListener : UdpBase {
         IPEndPoint listenOn;
 
-        public UdpListener() : this(new IPEndPoint(IPAddress.Any, 19000)) { }
+        public UdpListener() : this(new IPEndPoint(IPAddress.Any, Network.ServerPort)) { }
         public UdpListener(IPEndPoint endpoint) {
             listenOn = endpoint;
             Client = new UdpClient(listenOn);

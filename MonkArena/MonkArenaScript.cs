@@ -27,17 +27,10 @@ namespace MonkArena {
             }
         }
 
-        private void Server_MessageReceivedEvent(Received data) {
-            Server.StartReceive(); // Start listening again immediately
-
-            RWConsole.LogInfo($"{data.Sender}: {data.Message}");
-            Message m = new Message(data.Message);
-
-            Server.Reply(new Message("received", "", m.Token), data.Sender);
-
-            if (!ConnectedClients.ContainsKey(data.Sender)) {
+        private void CreateShellServerside(System.Net.IPEndPoint sender) {
+            if (!ConnectedClients.ContainsKey(sender)) {
                 RWConsole.LogInfo("Creating PlayerInfo...");
-                ConnectedClients[data.Sender] = new PlayerInfo();
+                ConnectedClients[sender] = new PlayerInfo();
 
                 RWConsole.LogInfo("Creating abstract player...");
                 AbstractCreature abstractPlayer = null;
@@ -59,16 +52,27 @@ namespace MonkArena {
                 RWConsole.LogInfo("Realizing player...");
                 try {
                     abstractPlayer?.Realize();
-                    ConnectedClients[data.Sender].Player = abstractPlayer?.realizedCreature as Player;
-                    if (ConnectedClients[data.Sender].Player == null) RWConsole.LogError("Player is null!");
+                    ConnectedClients[sender].Player = abstractPlayer?.realizedCreature as Player;
+                    if (ConnectedClients[sender].Player == null) RWConsole.LogError("Player is null!");
                 }
                 catch (Exception e) { RWConsole.LogError(e); }
                 RWConsole.LogInfo("Realized player.");
 
-                PlayerShell playerShell = new PlayerShell(ConnectedClients[data.Sender]);
+                PlayerShell playerShell = new PlayerShell(ConnectedClients[sender]);
                 Game.Players[0].Room.realizedRoom.AddObject(playerShell);
                 RWConsole.LogInfo("Created PlayerInfo");
             }
+        }
+
+        private void Server_MessageReceivedEvent(Received data) {
+            Server.StartReceive(); // Start listening again immediately
+
+            RWConsole.LogInfo($"{data.Sender}: {data.Message}");
+            Message m = new Message(data.Message);
+
+            CreateShellServerside(data.Sender);
+
+            Server.Reply(new Message("received", "", m.Token), data.Sender);
 
             Message receivedMessage = new Message(data.Message);
 
@@ -79,12 +83,12 @@ namespace MonkArena {
                     }
                     else RWConsole.LogError($"Bad animation string: {receivedMessage.Contents}");
                     break;
-                case "player_position":
-                    string[] pos = receivedMessage.Contents.Split(',');
-                    if (float.TryParse(pos[0], out float x) && float.TryParse(pos[1], out float y)) {
-                        ConnectedClients[data.Sender].Creature.bodyChunks[0].pos = new UnityEngine.Vector2(x, y);
-                    }
-                    else RWConsole.LogError($"Bad position string: {receivedMessage.Contents}");
+                case "player_chunkposition":
+                    string[] pos = receivedMessage.Contents.Split('|', ',');
+                    int chunkIndex = int.Parse(pos[0]);
+                    Vector2 chunkPosition = new Vector2(float.Parse(pos[1]), float.Parse(pos[2]));
+
+                    ConnectedClients[data.Sender].Creature.bodyChunks[chunkIndex].pos = chunkPosition;
                     break;
 
                 case "received":
@@ -98,7 +102,6 @@ namespace MonkArena {
                     RWConsole.LogError($"Unable to handle message of type: {receivedMessage.Type} with contents: {receivedMessage.Contents}");
                     break;
             }
-
         }
 
         private void Client_MessageReceivedEvent(Received data) {

@@ -8,7 +8,6 @@ namespace MonkArena {
         Handshake,
         HandshakeAck,
 
-        Received,
         Disconnect,
         Chat,
 
@@ -20,7 +19,6 @@ namespace MonkArena {
     public class Message {
         public MessageType Type { get; private set; }
         public short MessageLength { get; private set; }
-        public string Token { get; private set; }
         public string Contents { get; private set; }
 
         /// <summary>
@@ -49,19 +47,16 @@ namespace MonkArena {
             byte[] contents = new byte[MessageLength];
             Buffer.BlockCopy(from, currentPosition, contents, 0, MessageLength);
 
-            string[] stringContents = Encoding.ASCII.GetString(contents).Split(':');
-            Token = stringContents[0];
-            Contents = stringContents[1];
+            Contents = Encoding.ASCII.GetString(contents);
         }
-        public Message(MessageType type, string token, string contents) {
+        public Message(MessageType type, string contents) {
             Type = type;
-            Token = token;
             Contents = contents;
 
-            MessageLength = (short)Encoding.ASCII.GetByteCount(token + contents);
+            MessageLength = (short)Encoding.ASCII.GetByteCount(Contents);
         }
 
-        public override string ToString() => $"{Type}:{Token}:{Contents}";
+        public override string ToString() => $"{Type}:{Contents}";
         public byte[] GetData() {
             byte[] data = new byte[TYPE_LENGTH + LENGTH_LENGTH + MessageLength];
             int currentPosition = 0;
@@ -73,7 +68,7 @@ namespace MonkArena {
             Buffer.BlockCopy(length, 0, data, currentPosition, LENGTH_LENGTH);
             currentPosition += LENGTH_LENGTH;
 
-            byte[] contents = Encoding.ASCII.GetBytes(Token + ":" + Contents);
+            byte[] contents = Encoding.ASCII.GetBytes(Contents);
             Buffer.BlockCopy(contents, 0, data, currentPosition, MessageLength);
             return data;
         }

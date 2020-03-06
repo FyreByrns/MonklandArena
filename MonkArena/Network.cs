@@ -26,9 +26,6 @@ namespace MonkArena {
         /// </summary>
         public static Dictionary<IPEndPoint, PlayerInfo> ConnectedClients { get; private set; }
 
-        static Network() {
-        }
-
         /// <summary>
         /// Notifies of disconnection
         /// </summary>
@@ -47,10 +44,8 @@ namespace MonkArena {
             ConnectedClients = new Dictionary<IPEndPoint, PlayerInfo>();
 
             Server = new UdpListener();
-            MonkArena.Instance.AddServerScript();
             Server.StartReceive();
             IsServer = true;
-
         }
         #endregion
 
@@ -66,14 +61,9 @@ namespace MonkArena {
             RemotePlayers = new Dictionary<string, PlayerInfo>();
 
             Client = UdpUser.ConnectTo(address, port);
-            MonkArena.Instance.AddClientScript();
             Client.StartReceive();
             IsClient = true;
             Connected = true;
-
-            RWConsole.LogInfo("Sending handshake...");
-            Client.Send(new Message(MessageType.Handshake, ""));
-
         }
         #endregion
 

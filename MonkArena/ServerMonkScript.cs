@@ -12,7 +12,6 @@ namespace MonkArena {
 
         public ServerMonkScript() {
             Instance = this;
-
             Server.MessageReceivedEvent += Server_MessageReceivedEvent;
         }
 
@@ -60,10 +59,8 @@ namespace MonkArena {
         }
 
         public void Update() {
-            foreach (System.Net.IPEndPoint ipep in ConnectedClients.Keys) {
-                CreateShellServerside(ipep);
+            foreach (System.Net.IPEndPoint ipep in ConnectedClients.Keys)
                 ConnectedClients[ipep].Player.UpdateAnimation();
-            }
         }
 
         private void Server_MessageReceivedEvent(Received data) {
@@ -112,7 +109,7 @@ namespace MonkArena {
                     break;
 
                 default:
-                    RWConsole.LogError($"[SERVER] Unable to handle message of type: {receivedMessage.Type} with contents: {receivedMessage.Contents}");
+                    RWConsole.LogError($"[SERVER] Unable to handle message of type: {receivedMessage.Type} with contents: {receivedMessage.Contents} from: {data.Sender}");
                     break;
             }
         }

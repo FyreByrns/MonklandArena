@@ -18,7 +18,7 @@ namespace MonkArena {
         private static void MainMenu_ctor(On.Menu.MainMenu.orig_ctor orig, Menu.MainMenu self, ProcessManager manager, bool showRegionSpecificBkg) {
             orig(self, manager, showRegionSpecificBkg);
 
-            startServer = new SimpleButton(self, self.pages[0], "START SERVER", "START_SERVER", new Vector2(140f, 400f), new Vector2(110f, 30f));
+            startServer = new SimpleButton(self, self.pages[0], "START SERVER", "START_SERVER", new Vector2(200f, 400f), new Vector2(110f, 30f));
             //startClient = new SimpleButton(self, self.pages[0], "START CLIENT", "START_CLIENT", new Vector2(startServer.pos.x + 120, startServer.pos.y), new Vector2(110f, 30f));
 
             self.pages[0].subObjects.Add(startServer);
@@ -28,7 +28,7 @@ namespace MonkArena {
         private static void MainMenu_Singal(On.Menu.MainMenu.orig_Singal orig, MainMenu self, MenuObject sender, string message) {
             orig(self, sender, message);
 
-            if (message == "START_SERVER") Network.SetupServer();
+            if (message == "START_SERVER") MonkArena.Instance.AddServerScript();
             //if (message == "START_CLIENT") Network.SetupClient(Network.ServerIP, Network.ServerPort);
         }
     }

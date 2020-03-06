@@ -25,12 +25,18 @@ namespace MonkArena {
         }
 
         public void AddServerScript() {
+            if (Network.IsServer || Network.IsClient) return;
+            Network.SetupServer();
+
             GameObject serverScriptObject = new GameObject();
             serverScript = serverScriptObject.AddComponent<ServerMonkScript>();
             serverScript = new ServerMonkScript();
         }
 
         public void AddClientScript() {
+            if (Network.IsServer || Network.IsClient) return;
+            Network.SetupClient(Network.ServerIP, Network.ServerPort);
+
             GameObject clientScriptObject = new GameObject();
             clientScript = clientScriptObject.AddComponent<ClientMonkScript>();
             clientScript = new ClientMonkScript();

@@ -13,13 +13,17 @@ namespace MonkArena {
 
         public ClientMonkScript() {
             Instance = this;
-
             Client.MessageReceivedEvent += Client_MessageReceivedEvent;
         }
 
         public void Update() {
             foreach (string name in RemotePlayers.Keys)
                 RemotePlayers[name].Player.UpdateAnimation();
+        }
+
+        public void OnEnable() {
+            RWConsole.LogInfo("Sending handshake...");
+            Client.Send(new Message(MessageType.Handshake, ""));
         }
 
         /// <summary>
@@ -102,7 +106,7 @@ namespace MonkArena {
                     break;
 
                 default:
-                    RWConsole.LogError($"[CLIENT] Unable to handle message of type: {receivedMessage.Type} with contents: {receivedMessage.Contents}");
+                    RWConsole.LogError($"[CLIENT] Unable to handle message of type: {receivedMessage.Type} with contents: {receivedMessage.Contents} from: {data.Sender}");
                     break;
             }
 

@@ -73,8 +73,7 @@ namespace MonkArena {
         /// </summary>
         /// <param name="message"></param>
         public static void SendMessage(Message message) {
-            //RWConsole.LogInfo("Attempting to send message " + message.ToString());
-            if (!Connected && !IsServer) {
+            if (!IsClient && !IsServer) {
                 RWConsole.LogError("Can't send when disconnected.");
                 return;
             }
@@ -154,7 +153,6 @@ namespace MonkArena {
             byte[] receivedBytes = u.EndReceive(ar, ref e);
             Message receivedMessage = new Message(receivedBytes);
 
-            //RWConsole.LogInfo($"Received: {receivedString} From: {e}");
             MessageReceivedEvent?.Invoke(new Received() { Sender = e, Message = receivedMessage });
         }
     }

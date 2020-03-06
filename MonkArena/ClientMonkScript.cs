@@ -69,10 +69,6 @@ namespace MonkArena {
 
         private void Client_MessageReceivedEvent(Received data) {
             Client.StartReceive(); // Start listening again immediately
-
-            //if (!IsServer) RWConsole.LogInfo($"{data.Sender}: {data.Message}");
-            //RWConsole.LogInfo($"{Network.UnreceivedMessages.Count} messages not received by server.");
-
             Message receivedMessage = data.Message;
 
             switch (receivedMessage.Type) {

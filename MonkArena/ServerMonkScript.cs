@@ -65,7 +65,6 @@ namespace MonkArena {
 
         private void Server_MessageReceivedEvent(Received data) {
             Server.StartReceive(); // Start listening again immediately
-
             Message receivedMessage = data.Message;
             CreateShellServerside(data.Sender);
 

@@ -30,7 +30,6 @@ namespace MonkArena {
 
             GameObject serverScriptObject = new GameObject();
             serverScript = serverScriptObject.AddComponent<ServerMonkScript>();
-            serverScript = new ServerMonkScript();
         }
 
         public void AddClientScript() {
@@ -39,7 +38,6 @@ namespace MonkArena {
 
             GameObject clientScriptObject = new GameObject();
             clientScript = clientScriptObject.AddComponent<ClientMonkScript>();
-            clientScript = new ClientMonkScript();
         }
 
         public override void OnEnable() {

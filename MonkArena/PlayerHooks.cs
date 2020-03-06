@@ -29,7 +29,10 @@ namespace MonkArena {
 
             if (oldAnimation != self.animation) { // If the animation has changed, notify the server.
                 oldAnimation = self.animation;
-                Network.SendMessage(new Message(MessageType.PlayerAnimation, $"{(int)oldAnimation}"));
+                if (Network.IsClient)
+                    Network.SendMessage(new Message(MessageType.PlayerAnimation, $"{(int)oldAnimation}"));
+                else if (Network.IsServer)
+                    Network.SendMessage(new Message(MessageType.RemotePlayerAnimation, $"server|{(int)oldAnimation}"));
             }
 
             foreach (BodyChunk chunk in self.bodyChunks) {

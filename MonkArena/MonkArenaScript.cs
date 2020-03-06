@@ -39,7 +39,7 @@ namespace MonkArena {
         /// </summary>
         /// <param name="sender"></param>
         private void CreateShellServerside(System.Net.IPEndPoint sender) {
-            if (!ConnectedClients.Keys.Contains(sender)) {
+            if (ConnectedClients.Keys.Where(x => x.Equals(sender)).Count() == 0) {
                 RWConsole.LogInfo("Creating PlayerInfo...");
                 ConnectedClients[sender] = new PlayerInfo() {
                     Username = Message.GenerateToken()
@@ -128,7 +128,6 @@ namespace MonkArena {
                 case MessageType.PlayerAnimation:
                     int animation = int.Parse(receivedMessage.Contents);
                     ConnectedClients[data.Sender].Animation = (Player.AnimationIndex)animation;
-
                     SendMessageExcluding(new Message(MessageType.RemotePlayerAnimation, $"{ConnectedClients[data.Sender].Username}|{animation}"), data.Sender);
                     break;
                 case MessageType.PlayerChunkPosition:

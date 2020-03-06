@@ -43,6 +43,8 @@ namespace MonkArena {
         /// </summary>
         public static void SetupServer() {
             RWConsole.LogInfo("Starting server...");
+            MonkArena.Instance.AddServerScript();
+
             ConnectedClients = new Dictionary<IPEndPoint, PlayerInfo>();
 
             Server = new UdpListener();

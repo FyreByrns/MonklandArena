@@ -29,7 +29,7 @@ namespace MonkArena {
             orig(self, sender, message);
 
             if (message == "START_SERVER") Network.SetupServer();
-            if (message == "START_CLIENT") /* Properly start a client session */ ;
+            if (message == "START_CLIENT") Network.SetupClient(Network.ServerIP, Network.ServerPort);
         }
     }
 }

@@ -50,10 +50,6 @@ namespace MonkArena {
                     }
                 }
             }
-        }
-
-        private static void Player_UpdateAnimation(On.Player.orig_UpdateAnimation orig, Player self) {
-            orig(self);
 
             if (Network.IsServer)
                 foreach (System.Net.IPEndPoint ipep in Network.ConnectedClients.Keys)
@@ -61,6 +57,10 @@ namespace MonkArena {
             if (Network.IsClient)
                 foreach (string name in Network.RemotePlayers.Keys)
                     Network.RemotePlayers[name].Player.UpdateAnimation();
+        }
+
+        private static void Player_UpdateAnimation(On.Player.orig_UpdateAnimation orig, Player self) {
+            orig(self);
         }
 
         private static void Player_checkInput(On.Player.orig_checkInput orig, Player self) {

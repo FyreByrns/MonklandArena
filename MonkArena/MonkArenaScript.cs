@@ -25,6 +25,13 @@ namespace MonkArena {
                 Network.SetupClient(ServerIP, ServerPort);
                 Network.Client.MessageReceivedEvent += Client_MessageReceivedEvent;
             }
+
+            if (Network.IsServer)
+                foreach (System.Net.IPEndPoint ipep in Network.ConnectedClients.Keys)
+                    Network.ConnectedClients[ipep].Player.UpdateAnimation();
+            if (Network.IsClient)
+                foreach (string name in Network.RemotePlayers.Keys)
+                    Network.RemotePlayers[name].Player.UpdateAnimation();
         }
 
         /// <summary>

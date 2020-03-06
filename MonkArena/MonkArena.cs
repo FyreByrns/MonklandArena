@@ -35,6 +35,7 @@ namespace MonkArena {
 
             PlayerManager.Hook();
             PauseMenuHooks.Hook();
+            MainMenuHooks.Hook();
         }
 
         private void RainWorldGame_ExitGame(On.RainWorldGame.orig_ExitGame orig, RainWorldGame self, bool asDeath, bool asQuit) {

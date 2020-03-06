@@ -135,12 +135,18 @@ namespace MonkArena {
                     if (!float.TryParse(pos[1], out float x)) RWConsole.LogError("Bad chunkposition x");
                     if (!float.TryParse(pos[2], out float y)) RWConsole.LogError("Bad chunkposition y");
 
+                    if (!float.TryParse(pos[3], out float rx)) RWConsole.LogError("Bad chunkrotation x");
+                    if (!float.TryParse(pos[4], out float ry)) RWConsole.LogError("Bad chunkrotation y");
+
                     chunkIndex = int.Parse(pos[0]);
                     Vector2 chunkPosition = new Vector2(x, y);
+                    Vector2 chunkRotation = new Vector2(rx, ry);
                     ConnectedClients[data.Sender].Creature.bodyChunks[chunkIndex].pos = chunkPosition;
+                    ConnectedClients[data.Sender].Creature.bodyChunks[chunkIndex].Rotation.Set(rx, ry);
 
                     SendMessageExcluding(new Message(
-                        MessageType.RemotePlayerChunkPosition, $"{ConnectedClients[data.Sender].Username}|{chunkIndex}|{chunkPosition.x},{chunkPosition.y}"
+                        MessageType.RemotePlayerChunkPosition, $"{ConnectedClients[data.Sender].Username}|{chunkIndex}|" +
+                        $"{chunkPosition.x},{chunkPosition.y},{chunkRotation.x},{chunkRotation.y}"
                         ),
                         data.Sender);
                     break;
@@ -169,10 +175,17 @@ namespace MonkArena {
 
                     string username = pos[0];
                     int chunkIndex = int.Parse(pos[1]);
+
+                    if (!float.TryParse(pos[3], out float rx)) RWConsole.LogError("Bad chunkrotation x");
+                    if (!float.TryParse(pos[4], out float ry)) RWConsole.LogError("Bad chunkrotation y");
+
                     Vector2 chunkPosition = new Vector2(float.Parse(pos[2]), float.Parse(pos[3]));
+                    Vector2 chunkRotation = new Vector2(rx, ry);
+
 
                     CreateShellClientside(username);
                     RemotePlayers[username].Creature.bodyChunks[chunkIndex].pos = chunkPosition;
+                    RemotePlayers[username].Creature.bodyChunks[chunkIndex].Rotation.Set(rx, ry);
                     break;
 
                 default:

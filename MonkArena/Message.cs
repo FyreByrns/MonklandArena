@@ -12,6 +12,7 @@ namespace MonkArena {
         Chat,
 
         PlayerAnimation,
+        RemotePlayerAnimation,
         PlayerChunkPosition,
         RemotePlayerChunkPosition,
     }

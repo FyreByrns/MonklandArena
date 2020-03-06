@@ -40,11 +40,11 @@ namespace MonkArena {
 
                     if (Network.IsClient) {
                         Network.SendMessage(new Message
-                            (MessageType.PlayerChunkPosition, $"{chunkIndex}|{chunk.pos.x},{chunk.pos.y},{chunk.Rotation.x},{chunk.Rotation.y}"));
+                            (MessageType.PlayerChunkPosition, $"{chunkIndex}|{chunk.pos.x},{chunk.pos.y},{chunk.Rotation.x},{chunk.Rotation.y},{chunk.vel}"));
                     }
                     else if (Network.IsServer) {
                         Network.SendMessage(new Message
-                            (MessageType.RemotePlayerChunkPosition, $"server|{chunkIndex}|{chunk.pos.x},{chunk.pos.y},{chunk.Rotation.x},{chunk.Rotation.y}"));
+                            (MessageType.RemotePlayerChunkPosition, $"server|{chunkIndex}|{chunk.pos.x},{chunk.pos.y},{chunk.Rotation.x},{chunk.Rotation.y},{chunk.vel}"));
                     }
                 }
             }

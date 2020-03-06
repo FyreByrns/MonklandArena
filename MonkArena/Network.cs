@@ -105,8 +105,9 @@ namespace MonkArena {
         /// <param name="exclusion"></param>
         public static void SendMessageExcluding(Message message, IPEndPoint exclusion) {
             if (IsServer)
-                foreach (IPEndPoint ipep in ConnectedClients.Keys.Where(x => x != exclusion))
-                    Server.Reply(message, ipep);
+                foreach (IPEndPoint ipep in ConnectedClients.Keys)
+                    if (!ipep.Equals(exclusion))
+                        Server.Reply(message, ipep);
         }
 
         /// <summary>

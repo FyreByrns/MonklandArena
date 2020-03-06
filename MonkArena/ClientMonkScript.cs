@@ -102,7 +102,7 @@ namespace MonkArena {
                     break;
 
                 default:
-                    RWConsole.LogError($"Unable to handle message of type: {receivedMessage.Type} with contents: {receivedMessage.Contents}");
+                    RWConsole.LogError($"[CLIENT] Unable to handle message of type: {receivedMessage.Type} with contents: {receivedMessage.Contents}");
                     break;
             }
 

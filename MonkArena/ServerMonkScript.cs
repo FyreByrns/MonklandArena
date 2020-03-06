@@ -60,8 +60,10 @@ namespace MonkArena {
         }
 
         public void Update() {
-            foreach (System.Net.IPEndPoint ipep in ConnectedClients.Keys)
+            foreach (System.Net.IPEndPoint ipep in ConnectedClients.Keys) {
+                CreateShellServerside(ipep);
                 ConnectedClients[ipep].Player.UpdateAnimation();
+            }
         }
 
         private void Server_MessageReceivedEvent(Received data) {
@@ -76,6 +78,7 @@ namespace MonkArena {
                     ConnectedClients[data.Sender].Animation = (Player.AnimationIndex)animation;
                     SendMessageExcluding(new Message(MessageType.RemotePlayerAnimation, $"{ConnectedClients[data.Sender].Username}|{animation}"), data.Sender);
                     break;
+
                 case MessageType.PlayerChunkPosition:
                     string[] pos = receivedMessage.Contents.Split('|', ',');
 
@@ -109,7 +112,7 @@ namespace MonkArena {
                     break;
 
                 default:
-                    RWConsole.LogError($"Unable to handle message of type: {receivedMessage.Type} with contents: {receivedMessage.Contents}");
+                    RWConsole.LogError($"[SERVER] Unable to handle message of type: {receivedMessage.Type} with contents: {receivedMessage.Contents}");
                     break;
             }
         }

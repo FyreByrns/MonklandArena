@@ -43,13 +43,14 @@ namespace MonkArena {
         /// </summary>
         public static void SetupServer() {
             RWConsole.LogInfo("Starting server...");
-            MonkArena.Instance.AddServerScript();
 
             ConnectedClients = new Dictionary<IPEndPoint, PlayerInfo>();
 
             Server = new UdpListener();
+            MonkArena.Instance.AddServerScript();
             Server.StartReceive();
             IsServer = true;
+
         }
         #endregion
 
@@ -61,15 +62,18 @@ namespace MonkArena {
         /// <param name="port">Server port</param>
         public static void SetupClient(string address, int port) {
             RWConsole.LogInfo("Attempting connection to " + address);
+
             RemotePlayers = new Dictionary<string, PlayerInfo>();
 
             Client = UdpUser.ConnectTo(address, port);
+            MonkArena.Instance.AddClientScript();
             Client.StartReceive();
             IsClient = true;
             Connected = true;
 
             RWConsole.LogInfo("Sending handshake...");
             Client.Send(new Message(MessageType.Handshake, ""));
+
         }
         #endregion
 

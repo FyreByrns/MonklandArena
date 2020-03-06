@@ -137,12 +137,17 @@ namespace MonkArena {
 
                     if (!float.TryParse(pos[3], out float rx)) RWConsole.LogError("Bad chunkrotation x");
                     if (!float.TryParse(pos[4], out float ry)) RWConsole.LogError("Bad chunkrotation y");
+                    if (!float.TryParse(pos[5], out float velx)) RWConsole.LogError("Bad velocity x");
+                    if (!float.TryParse(pos[6], out float vely)) RWConsole.LogError("Bad velocity y");
 
                     chunkIndex = int.Parse(pos[0]);
                     Vector2 chunkPosition = new Vector2(x, y);
                     Vector2 chunkRotation = new Vector2(rx, ry);
+                    Vector2 chunkVelocity = new Vector2(velx, vely);
+
                     ConnectedClients[data.Sender].Creature.bodyChunks[chunkIndex].pos = chunkPosition;
                     ConnectedClients[data.Sender].Creature.bodyChunks[chunkIndex].Rotation.Set(rx, ry);
+                    ConnectedClients[data.Sender].Creature.bodyChunks[chunkIndex].vel = chunkVelocity;
 
                     SendMessageExcluding(new Message(
                         MessageType.RemotePlayerChunkPosition, $"{ConnectedClients[data.Sender].Username}|{chunkIndex}|" +
@@ -176,16 +181,20 @@ namespace MonkArena {
                     string username = pos[0];
                     int chunkIndex = int.Parse(pos[1]);
 
-                    if (!float.TryParse(pos[3], out float rx)) RWConsole.LogError("Bad chunkrotation x");
-                    if (!float.TryParse(pos[4], out float ry)) RWConsole.LogError("Bad chunkrotation y");
+                    if (!float.TryParse(pos[4], out float rx)) RWConsole.LogError("Bad chunkrotation x");
+                    if (!float.TryParse(pos[5], out float ry)) RWConsole.LogError("Bad chunkrotation y");
+
+                    if (!float.TryParse(pos[6], out float velx)) RWConsole.LogError("Bad velocity x");
+                    if (!float.TryParse(pos[7], out float vely)) RWConsole.LogError("Bad velocity y");
 
                     Vector2 chunkPosition = new Vector2(float.Parse(pos[2]), float.Parse(pos[3]));
                     Vector2 chunkRotation = new Vector2(rx, ry);
-
+                    Vector2 chunkVelocity = new Vector2(velx, vely);
 
                     CreateShellClientside(username);
                     RemotePlayers[username].Creature.bodyChunks[chunkIndex].pos = chunkPosition;
                     RemotePlayers[username].Creature.bodyChunks[chunkIndex].Rotation.Set(rx, ry);
+                    RemotePlayers[username].Creature.bodyChunks[chunkIndex].vel = chunkVelocity;
                     break;
 
                 default:

@@ -39,10 +39,12 @@ namespace MonkArena {
                     int chunkIndex = self.bodyChunks.IndexOf(chunk);
 
                     if (Network.IsClient) {
-                        Network.SendMessage(new Message(MessageType.PlayerChunkPosition, $"{chunkIndex}|{chunk.pos.x},{chunk.pos.y},{chunk.Rotation}"));
+                        Network.SendMessage(new Message
+                            (MessageType.PlayerChunkPosition, $"{chunkIndex}|{chunk.pos.x},{chunk.pos.y},{chunk.Rotation.x},{chunk.Rotation.y}"));
                     }
                     else if (Network.IsServer) {
-                        Network.SendMessage(new Message(MessageType.RemotePlayerChunkPosition, $"server|{chunkIndex}|{chunk.pos.x},{chunk.pos.y},{chunk.Rotation}"));
+                        Network.SendMessage(new Message
+                            (MessageType.RemotePlayerChunkPosition, $"server|{chunkIndex}|{chunk.pos.x},{chunk.pos.y},{chunk.Rotation.x},{chunk.Rotation.y}"));
                     }
                 }
             }

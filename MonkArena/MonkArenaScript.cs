@@ -39,7 +39,7 @@ namespace MonkArena {
         /// </summary>
         /// <param name="sender"></param>
         private void CreateShellServerside(System.Net.IPEndPoint sender) {
-            if (ConnectedClients.Keys.Where(x => x.Equals(sender)).Count() == 0) {
+            if (!ConnectedClients.Keys.Contains(sender)) {
                 RWConsole.LogInfo("Creating PlayerInfo...");
                 ConnectedClients[sender] = new PlayerInfo() {
                     Username = Message.GenerateToken()

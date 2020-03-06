@@ -126,10 +126,10 @@ namespace MonkArena {
 
             switch (receivedMessage.Type) {
                 case MessageType.PlayerAnimation:
-                    if (int.TryParse(receivedMessage.Contents, out int result)) {
-                        ConnectedClients[data.Sender].Animation = (Player.AnimationIndex)result;
-                    }
-                    else RWConsole.LogError($"Bad animation string: {receivedMessage.Contents}");
+                    int animation = int.Parse(receivedMessage.Contents);
+                    ConnectedClients[data.Sender].Animation = (Player.AnimationIndex)animation;
+
+                    SendMessageExcluding(new Message(MessageType.RemotePlayerAnimation, $"{ConnectedClients[data.Sender].Username}|{animation}"), data.Sender);
                     break;
                 case MessageType.PlayerChunkPosition:
                     string[] pos = receivedMessage.Contents.Split('|', ',');
@@ -178,10 +178,17 @@ namespace MonkArena {
             Message receivedMessage = data.Message;
 
             switch (receivedMessage.Type) {
+                case MessageType.RemotePlayerAnimation:
+                    string[] anim = receivedMessage.Contents.Split('|');
+                    string username = anim[0];
+                    Player.AnimationIndex animationIndex = (Player.AnimationIndex)int.Parse(anim[1]);
+                    RemotePlayers[username].Animation = animationIndex;
+                    break;
+
                 case MessageType.RemotePlayerChunkPosition:
                     string[] pos = receivedMessage.Contents.Split('|', ',');
 
-                    string username = pos[0];
+                    username = pos[0];
                     int chunkIndex = int.Parse(pos[1]);
 
                     if (!float.TryParse(pos[4], out float rx)) RWConsole.LogError("Bad chunkrotation x");

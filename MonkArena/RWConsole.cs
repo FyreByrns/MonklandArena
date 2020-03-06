@@ -11,7 +11,7 @@ namespace MonkArena {
     public static class RWConsole {
         public static StreamWriter Output;
         static FileStream stream;
-        static object lastMessage;
+        static string lastMessage;
 
         static int countOfLastMessage;
 
@@ -36,14 +36,15 @@ namespace MonkArena {
             Log($"{condition}\t{stackTrace}", type.ToString());
         }
         public static void Log(object message, string prefix = "INFO") {
-            if (message == lastMessage) countOfLastMessage++;
+            string strMessage = $"[{prefix}]{message}";
+            if (strMessage == lastMessage) countOfLastMessage++;
             else {
                 countOfLastMessage = 1;
                 Output.WriteLine();
             }
-            lastMessage = message;
+            lastMessage = strMessage;
 
-            string toConsole = $"\r{countOfLastMessage}x[{prefix}][{DateTime.UtcNow}] {message}{(message == lastMessage ? " " : "\n")}";
+            string toConsole = $"\r{countOfLastMessage}x[{DateTime.UtcNow}]{strMessage}";
             Output.Write(toConsole);
         }
         public static void LogError(object message) {

@@ -26,9 +26,6 @@ namespace MonkArena {
         /// </summary>
         public static Dictionary<IPEndPoint, PlayerInfo> ConnectedClients { get; private set; }
 
-        static Network() {
-        }
-
         /// <summary>
         /// Notifies of disconnection
         /// </summary>
@@ -43,6 +40,7 @@ namespace MonkArena {
         /// </summary>
         public static void SetupServer() {
             RWConsole.LogInfo("Starting server...");
+
             ConnectedClients = new Dictionary<IPEndPoint, PlayerInfo>();
 
             Server = new UdpListener();
@@ -59,15 +57,13 @@ namespace MonkArena {
         /// <param name="port">Server port</param>
         public static void SetupClient(string address, int port) {
             RWConsole.LogInfo("Attempting connection to " + address);
+
             RemotePlayers = new Dictionary<string, PlayerInfo>();
 
             Client = UdpUser.ConnectTo(address, port);
             Client.StartReceive();
             IsClient = true;
             Connected = true;
-
-            RWConsole.LogInfo("Sending handshake...");
-            Client.Send(new Message(MessageType.Handshake, ""));
         }
         #endregion
 
@@ -77,8 +73,7 @@ namespace MonkArena {
         /// </summary>
         /// <param name="message"></param>
         public static void SendMessage(Message message) {
-            //RWConsole.LogInfo("Attempting to send message " + message.ToString());
-            if (!Connected && !IsServer) {
+            if (!IsClient && !IsServer) {
                 RWConsole.LogError("Can't send when disconnected.");
                 return;
             }
@@ -158,7 +153,6 @@ namespace MonkArena {
             byte[] receivedBytes = u.EndReceive(ar, ref e);
             Message receivedMessage = new Message(receivedBytes);
 
-            //RWConsole.LogInfo($"Received: {receivedString} From: {e}");
             MessageReceivedEvent?.Invoke(new Received() { Sender = e, Message = receivedMessage });
         }
     }

@@ -5,6 +5,8 @@ using System.Text;
 
 namespace MonkArena {
     public enum MessageType : byte {
+        ERROR,
+
         Handshake,
         HandshakeAck,
 
@@ -71,6 +73,7 @@ namespace MonkArena {
 
             byte[] contents = Encoding.ASCII.GetBytes(Contents);
             Buffer.BlockCopy(contents, 0, data, currentPosition, MessageLength);
+
             return data;
         }
 

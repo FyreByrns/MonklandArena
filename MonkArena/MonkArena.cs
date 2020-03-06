@@ -12,23 +12,39 @@ namespace MonkArena {
         public string Revision { get; } = "1";
         #endregion
 
-        MonkArenaScript script;
+        public static MonkArena Instance { get; private set; }
+        public ClientMonkScript clientScript;
+        public ServerMonkScript serverScript;
 
         public MonkArena() {
+            Instance = this;
+
             author = "Little Tiny Big";
             ModID = "MonkArena";
             Version = $"{MajorVersion}.{MinorVersion}.{Revision}";
         }
 
+        public void AddServerScript() {
+            if (Network.IsServer || Network.IsClient) return;
+            Network.SetupServer();
+
+            GameObject serverScriptObject = new GameObject();
+            serverScript = serverScriptObject.AddComponent<ServerMonkScript>();
+        }
+
+        public void AddClientScript() {
+            if (Network.IsServer || Network.IsClient) return;
+            Network.SetupClient(Network.ServerIP, Network.ServerPort);
+
+            GameObject clientScriptObject = new GameObject();
+            clientScript = clientScriptObject.AddComponent<ClientMonkScript>();
+        }
+
         public override void OnEnable() {
             base.OnEnable();
+            Debug.Log("Using monkland.");
 
-            Debug.Log("------------------------------------------------------------INITIALIZING LOGGER");
             RWConsole.Initialize();
-
-            GameObject scriptObject = new GameObject();
-            script = scriptObject.AddComponent<MonkArenaScript>();
-            script = new MonkArenaScript();
 
             AppDomain.CurrentDomain.ProcessExit += CurrentDomain_ProcessExit;
             On.RainWorldGame.ExitGame += RainWorldGame_ExitGame;

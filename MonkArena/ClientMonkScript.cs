@@ -75,7 +75,11 @@ namespace MonkArena {
                 case MessageType.RemotePlayerAnimation:
                     string[] anim = receivedMessage.Contents.Split('|');
                     string username = anim[0];
-                    Player.AnimationIndex animationIndex = (Player.AnimationIndex)int.Parse(anim[1]);
+                    int animation = int.Parse(anim[1]);
+                    int frame = int.Parse(anim[2]);
+
+                    Player.AnimationIndex animationIndex = (Player.AnimationIndex)animation;
+                    typeof(Player).GetProperty("animationFrame").SetValue(RemotePlayers[username].Player, frame, null);
                     RemotePlayers[username].Animation = animationIndex;
                     break;
 

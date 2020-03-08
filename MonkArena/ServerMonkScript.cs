@@ -70,8 +70,12 @@ namespace MonkArena {
 
             switch (receivedMessage.Type) {
                 case MessageType.PlayerAnimation:
-                    int animation = int.Parse(receivedMessage.Contents);
+                    string[] anim = receivedMessage.Contents.Split('|');
+                    int animation = int.Parse(anim[0]);
+                    int frame = int.Parse(anim[1]);
+
                     ConnectedClients[data.Sender].Animation = (Player.AnimationIndex)animation;
+                    typeof(Player).GetProperty("animationFrame").SetValue(ConnectedClients[data.Sender].Player, frame, null);
                     SendMessageExcluding(new Message(MessageType.RemotePlayerAnimation, $"{ConnectedClients[data.Sender].Username}|{animation}"), data.Sender);
                     break;
 

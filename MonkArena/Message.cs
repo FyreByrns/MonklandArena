@@ -60,7 +60,7 @@ namespace MonkArena {
         }
 
         public override string ToString() => $"{Type}:{Contents}";
-        public byte[] GetData() {
+        public virtual byte[] GetData() {
             byte[] data = new byte[TYPE_LENGTH + LENGTH_LENGTH + MessageLength];
             int currentPosition = 0;
 

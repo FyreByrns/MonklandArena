@@ -62,7 +62,7 @@ namespace MonkArena {
             foreach (System.Net.IPEndPoint ipep in ConnectedClients.Keys) {
                 int oldFrame = ConnectedClients[ipep].Player.animationFrame;
                 ConnectedClients[ipep].Player.UpdateAnimation();
-                ConnectedClients[ipep].Player.animationFrame.SetPrivatePropertyValue("animationFrame", oldFrame);
+                ConnectedClients[ipep].Player.SetPrivatePropertyValue("animationFrame", oldFrame);
             }
         }
 

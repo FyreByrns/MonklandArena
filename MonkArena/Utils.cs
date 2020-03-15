@@ -23,7 +23,7 @@ namespace System.Runtime.CompilerServices {
 }
 
 namespace MonkArena {
-    public static class Utils {
+    public static partial class Utils {
         #region Reflection Magic
         /// <summary>
         /// Returns a _private_ Property Value from a given Object. Uses Reflection.

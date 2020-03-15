@@ -59,8 +59,11 @@ namespace MonkArena {
         }
 
         public void Update() {
-            foreach (System.Net.IPEndPoint ipep in ConnectedClients.Keys)
+            foreach (System.Net.IPEndPoint ipep in ConnectedClients.Keys) {
+                int oldFrame = ConnectedClients[ipep].Player.animationFrame;
                 ConnectedClients[ipep].Player.UpdateAnimation();
+                ConnectedClients[ipep].Player.animationFrame.SetPrivatePropertyValue("animationFrame", oldFrame);
+            }
         }
 
         private void Server_MessageReceivedEvent(Received data) {

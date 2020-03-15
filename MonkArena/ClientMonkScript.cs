@@ -17,8 +17,11 @@ namespace MonkArena {
         }
 
         public void Update() {
-            foreach (string name in RemotePlayers.Keys)
+            foreach (string name in RemotePlayers.Keys) {
+                int oldFrame = RemotePlayers[name].Player.animationFrame;
                 RemotePlayers[name].Player.UpdateAnimation();
+                RemotePlayers[name].Player.SetPrivatePropertyValue("animationFrame", oldFrame);
+            }
         }
 
         public void OnEnable() {

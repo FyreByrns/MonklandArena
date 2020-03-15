@@ -122,7 +122,7 @@ namespace MonkArena {
         /// Information relevant to networked players
         /// </summary>
         public class PlayerInfo {
-            public string Username { get; set; }
+            public short ID { get; set; }
 
             public bool Alive => !Creature.dead;
             public bool Dead => !Alive;

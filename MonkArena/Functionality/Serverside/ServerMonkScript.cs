@@ -10,6 +10,9 @@ namespace MonkArena {
         public static ServerMonkScript Instance { get; private set; }
         static RainWorldGame Game => FindObjectOfType<RainWorld>()?.processManager?.currentMainLoop as RainWorldGame;
 
+        static short lastID = 0;
+        public static short GetNewID() => ++lastID;
+
         public ServerMonkScript() {
             Instance = this;
             Server.MessageReceivedEvent += Server_MessageReceivedEvent;
@@ -21,7 +24,7 @@ namespace MonkArena {
 
                 ConnectedClients[data.Sender].Animation = (Player.AnimationIndex)animation;
                 typeof(Player).GetProperty("animationFrame").SetValue(ConnectedClients[data.Sender].Player, frame, null);
-                SendMessageExcluding(new Message(MessageType.RemotePlayerAnimation, $"{ConnectedClients[data.Sender].Username}|{animation}"), data.Sender);
+                SendMessageExcluding(new Message(MessageType.RemotePlayerAnimation, $"{ConnectedClients[data.Sender].ID}|{animation}"), data.Sender);
             });
             Parser.AddRule(MessageType.PlayerChunkPosition, (Message receivedMessage, Received data) => {
                 string[] pos = receivedMessage.Contents.Split('|', ',');
@@ -45,7 +48,7 @@ namespace MonkArena {
                 ConnectedClients[data.Sender].Creature.bodyChunks[chunkIndex].vel = chunkVelocity;
 
                 SendMessageExcluding(new Message(
-                    MessageType.RemotePlayerChunkPosition, $"{ConnectedClients[data.Sender].Username}|{chunkIndex}|" +
+                    MessageType.RemotePlayerChunkPosition, $"{ConnectedClients[data.Sender].ID}|{chunkIndex}|" +
                     $"{chunkPosition.x},{chunkPosition.y},{chunkRotation.x},{chunkRotation.y}"
                     ),
                     data.Sender);
@@ -63,7 +66,7 @@ namespace MonkArena {
             if (ConnectedClients.Keys.Where(x => x.Equals(sender)).Count() == 0) {
                 RWConsole.LogInfo("Creating PlayerInfo...");
                 ConnectedClients[sender] = new PlayerInfo() {
-                    Username = Message.GenerateToken()
+                    ID = GetNewID(),
                 };
 
                 RWConsole.LogInfo("Creating abstract player...");

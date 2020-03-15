@@ -56,19 +56,8 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ClientMonkScript.cs" />
-    <Compile Include="MainMenuHooks.cs" />
-    <Compile Include="Message.cs" />
-    <Compile Include="MonkArena.cs" />
-    <Compile Include="Network.cs" />
-    <Compile Include="PauseMenuHooks.cs" />
-    <Compile Include="PlayerHooks.cs" />
-    <Compile Include="PlayerShell.cs" />
-    <Compile Include="RWConsole.cs" />
-    <Compile Include="Serialization.cs" />
-    <Compile Include="ServerMonkScript.cs" />
-    <Compile Include="Utils.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="*/*.cs" />
+    <Compile Include="*/*/*.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

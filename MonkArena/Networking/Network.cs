@@ -6,6 +6,8 @@ using System.Net;
 using System.Net.Sockets;
 using System.Threading;
 
+using MonkArena.Functionality.Unsided;
+
 namespace MonkArena {
     public static class Network {
         public static UdpListener Server { get; private set; }
@@ -27,6 +29,15 @@ namespace MonkArena {
         public static Dictionary<IPEndPoint, PlayerInfo> ConnectedClients { get; private set; }
 
         /// <summary>
+        /// [Serverside] All PhysicalObjects to simulate
+        /// </summary>
+        public static Dictionary<short, PhysicalObjectInfo> PhysicalObjects { get; private set; }
+        /// <summary>
+        /// [Clientside] Server-controlled PhysicalObjectShells
+        /// </summary>
+        public static Dictionary<short, PhysicalObjectShell> PhysicalObjectShells { get; private set; }
+
+        /// <summary>
         /// Notifies of disconnection
         /// </summary>
         public static void Disconnect() {
@@ -42,6 +53,7 @@ namespace MonkArena {
             RWConsole.LogInfo("Starting server...");
 
             ConnectedClients = new Dictionary<IPEndPoint, PlayerInfo>();
+            PhysicalObjects = new Dictionary<short, PhysicalObjectInfo>();
 
             Server = new UdpListener();
             Server.StartReceive();
@@ -59,6 +71,7 @@ namespace MonkArena {
             RWConsole.LogInfo("Attempting connection to " + address);
 
             RemotePlayers = new Dictionary<string, PlayerInfo>();
+            PhysicalObjectShells = new Dictionary<short, PhysicalObjectShell>();
 
             Client = UdpUser.ConnectTo(address, port);
             Client.StartReceive();

@@ -7,13 +7,48 @@ using UnityEngine;
 using static MonkArena.Network;
 
 namespace MonkArena {
-    public class ClientMonkScript : MonoBehaviour {
+    public class ClientMonkScript : Script {
         public static ClientMonkScript Instance { get; private set; }
         static RainWorldGame Game => FindObjectOfType<RainWorld>()?.processManager?.currentMainLoop as RainWorldGame;
 
         public ClientMonkScript() {
             Instance = this;
             Client.MessageReceivedEvent += Client_MessageReceivedEvent;
+
+            Parser.AddRule(MessageType.HandshakeAck, (Message receivedMessage, Received data) => {
+                RWConsole.LogInfo("Handshake acknowledged!");
+            });
+            Parser.AddRule(MessageType.RemotePlayerAnimation, (Message receivedMessage, Received data) => {
+                string[] anim = receivedMessage.Contents.Split('|');
+                string username = anim[0];
+                int animation = int.Parse(anim[1]);
+                int frame = int.Parse(anim[2]);
+
+                Player.AnimationIndex animationIndex = (Player.AnimationIndex)animation;
+                typeof(Player).GetProperty("animationFrame").SetValue(RemotePlayers[username].Player, frame, null);
+                RemotePlayers[username].Animation = animationIndex;
+            });
+            Parser.AddRule(MessageType.RemotePlayerChunkPosition, (Message receivedMessage, Received data) => {
+                string[] pos = receivedMessage.Contents.Split('|', ',');
+
+                string username = pos[0];
+                int chunkIndex = int.Parse(pos[1]);
+
+                if (!float.TryParse(pos[4], out float rx)) RWConsole.LogError("Bad chunkrotation x");
+                if (!float.TryParse(pos[5], out float ry)) RWConsole.LogError("Bad chunkrotation y");
+
+                if (!float.TryParse(pos[6], out float velx)) RWConsole.LogError("Bad velocity x");
+                if (!float.TryParse(pos[7], out float vely)) RWConsole.LogError("Bad velocity y");
+
+                Vector2 chunkPosition = new Vector2(float.Parse(pos[2]), float.Parse(pos[3]));
+                Vector2 chunkRotation = new Vector2(rx, ry);
+                Vector2 chunkVelocity = new Vector2(velx, vely);
+
+                CreateShellClientside(username);
+                RemotePlayers[username].Creature.bodyChunks[chunkIndex].pos = chunkPosition;
+                RemotePlayers[username].Creature.bodyChunks[chunkIndex].Rotation.Set(rx, ry);
+                RemotePlayers[username].Creature.bodyChunks[chunkIndex].vel = chunkVelocity;
+            });
         }
 
         public void Update() {
@@ -74,45 +109,8 @@ namespace MonkArena {
             Client.StartReceive(); // Start listening again immediately
             Message receivedMessage = data.Message;
 
-            switch (receivedMessage.Type) {
-                case MessageType.RemotePlayerAnimation:
-                    string[] anim = receivedMessage.Contents.Split('|');
-                    string username = anim[0];
-                    int animation = int.Parse(anim[1]);
-                    int frame = int.Parse(anim[2]);
-
-                    Player.AnimationIndex animationIndex = (Player.AnimationIndex)animation;
-                    typeof(Player).GetProperty("animationFrame").SetValue(RemotePlayers[username].Player, frame, null);
-                    RemotePlayers[username].Animation = animationIndex;
-                    break;
-
-                case MessageType.RemotePlayerChunkPosition:
-                    string[] pos = receivedMessage.Contents.Split('|', ',');
-
-                    username = pos[0];
-                    int chunkIndex = int.Parse(pos[1]);
-
-                    if (!float.TryParse(pos[4], out float rx)) RWConsole.LogError("Bad chunkrotation x");
-                    if (!float.TryParse(pos[5], out float ry)) RWConsole.LogError("Bad chunkrotation y");
-
-                    if (!float.TryParse(pos[6], out float velx)) RWConsole.LogError("Bad velocity x");
-                    if (!float.TryParse(pos[7], out float vely)) RWConsole.LogError("Bad velocity y");
-
-                    Vector2 chunkPosition = new Vector2(float.Parse(pos[2]), float.Parse(pos[3]));
-                    Vector2 chunkRotation = new Vector2(rx, ry);
-                    Vector2 chunkVelocity = new Vector2(velx, vely);
-
-                    CreateShellClientside(username);
-                    RemotePlayers[username].Creature.bodyChunks[chunkIndex].pos = chunkPosition;
-                    RemotePlayers[username].Creature.bodyChunks[chunkIndex].Rotation.Set(rx, ry);
-                    RemotePlayers[username].Creature.bodyChunks[chunkIndex].vel = chunkVelocity;
-                    break;
-
-                default:
-                    RWConsole.LogError($"[CLIENT] Unable to handle message of type: {receivedMessage.Type} with contents: {receivedMessage.Contents} from: {data.Sender}");
-                    break;
-            }
-
+            if (Parser.TryParse(receivedMessage, data)) ; // Parse message
+            else RWConsole.LogError($"Couldn't parse message with type {receivedMessage.Type} and contents {receivedMessage.Contents}");
         }
     }
 }

@@ -4,21 +4,6 @@ using System.Linq;
 using System.Text;
 
 namespace MonkArena {
-    public enum MessageType : byte {
-        ERROR,
-
-        Handshake,
-        HandshakeAck,
-
-        Disconnect,
-        Chat,
-
-        PlayerAnimation,
-        RemotePlayerAnimation,
-        PlayerChunkPosition,
-        RemotePlayerChunkPosition,
-    }
-
     public class Message {
         public MessageType Type { get; private set; }
         public short MessageLength { get; private set; }

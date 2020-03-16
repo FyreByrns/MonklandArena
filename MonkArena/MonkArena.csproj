@@ -57,7 +57,14 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="*/*.cs" />
-    <Compile Include="*/*/*.cs" />
+    <Compile Include="Functionality\Clientside\ClientMonkScript.cs" />
+    <Compile Include="Functionality\Serverside\ServerMonkScript.cs" />
+    <Compile Include="Functionality\Unsided\MainMenuHooks.cs" />
+    <Compile Include="Functionality\Unsided\MonkArena.cs" />
+    <Compile Include="Functionality\Unsided\PauseMenuHooks.cs" />
+    <Compile Include="Functionality\Unsided\PlayerHooks.cs" />
+    <Compile Include="Functionality\Unsided\PlayerShell.cs" />
+    <Compile Include="Functionality\Unsided\Script.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

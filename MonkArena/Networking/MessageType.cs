@@ -29,7 +29,7 @@
         PlayerChunkPosition,
         RemotePlayerChunkPosition,
 
-        // PhysicalObject stuff
+        #region PhysicalObject
         /// <summary>
         /// [Server -> Client] Tell client to create a network controlled <see cref="PhysicalObject"/>
         /// <para>
@@ -44,6 +44,7 @@
         /// </para>
         /// </summary>
         PhysicalObjectInitialize,
+
         /// <summary>
         /// [Server -> Client] Populate <see cref="BodyChunk"/> in network controlled <see cref="PhysicalObject"/>
         /// <para>
@@ -68,5 +69,7 @@
         /// </summary>
         BodyChunkUpdate,
         GraphicsModule,
+
+        #endregion
     }
 }

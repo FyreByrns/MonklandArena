@@ -31,6 +31,14 @@
 
         #region PhysicalObject
         /// <summary>
+        /// [Server -> Client] Tell client to remove a network controlled PhysicalObject
+        /// <para>
+        /// <see cref="short"/> ID
+        /// </para>
+        /// </summary>
+        PhysicalObjectRemove,
+
+        /// <summary>
         /// [Server -> Client] Tell client to create a network controlled <see cref="PhysicalObject"/>
         /// <para>
         /// <see cref="short"/> owner ID,
@@ -68,6 +76,18 @@
         /// </para>
         /// </summary>
         BodyChunkUpdate,
+
+        /// <summary>
+        /// [Server -> Client] Tell client to create an <see cref="PhysicalObject.Appendage"/> on a network controlled <see cref="PhysicalObject"/>
+        /// <para>
+        /// <see cref="short"/> owner ID,
+        /// <see cref="short"/> index,
+        /// <see cref="short"/> totalSegs
+        /// </para>
+        /// </summary>
+        AppendageInitialize,
+        AppendageUpdate,
+
         GraphicsModule,
 
         #endregion

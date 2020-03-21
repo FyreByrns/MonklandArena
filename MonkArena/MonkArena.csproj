@@ -59,6 +59,7 @@
     <Compile Include="*/*.cs" />
     <Compile Include="Functionality\Clientside\ClientMonkScript.cs" />
     <Compile Include="Functionality\Serverside\ServerMonkScript.cs" />
+    <Compile Include="Functionality\Serverside\ServersideRoomHooks.cs" />
     <Compile Include="Functionality\Unsided\MainMenuHooks.cs" />
     <Compile Include="Functionality\Unsided\MonkArena.cs" />
     <Compile Include="Functionality\Unsided\PauseMenuHooks.cs" />
